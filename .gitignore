@@ -1,0 +1,7 @@
+var/
+
+docker/mysql
+docker/mailhog
+
+
+.idea/

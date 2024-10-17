@@ -1,0 +1,83 @@
+services:
+    traefik:
+        image: "traefik:v2.11"
+        command:
+            - "--log.level=DEBUG"
+            - "--api.insecure=true"
+            - "--providers.docker=true"
+            - "--providers.docker.exposedbydefault=false"
+            - "--entrypoints.web.address=:80"
+            - "--entrypoints.mailhog.address=:8025"
+        ports:
+            - "80:80"
+            - "8080:8080"
+            - "3000:3000"
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+    api:
+        image: nginx:1.21
+        depends_on:
+            - php
+        volumes:
+            - ./docker/nginx/:/etc/nginx/conf.d/:ro
+            - ./api:/var/www/app
+            - ./var/logs/nginx/:/var/log/nginx
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.api.rule=Host(`api.immo.localhost`)"
+            - "traefik.http.routers.api.entrypoints=web"
+
+    php:
+        build:
+            context: ./api
+            target: api-base
+        working_dir: /var/www/app
+        environment:
+            - PHP_DATE_TIMEZONE=UTC
+        volumes:
+            - ./api:/var/www/app/:rw,cached
+            - ./var:/var/shared
+
+    mailhog:
+        # do not use in production!
+        image: mailhog/mailhog:latest
+        environment:
+            - MH_STORAGE=maildir
+        volumes:
+            - ./docker/mailhog/maildir:/maildir:rw,delegated
+        ports:
+            - "8025:8025"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.mailhog.rule=Host(`mail.immo.localhost`)"
+            - "traefik.http.routers.mailhog.entrypoints=mailhog"
+
+    mysql:
+        image: mariadb:10.4.34
+        command: --max_allowed_packet=32505856 --sql_mode=""
+        environment:
+            - MARIADB_ROOT_PASSWORD=root
+            - MARIADB_DATABASE=immo
+            - MARIADB_USER=immo
+            - MARIADB_PASSWORD=immo
+        volumes:
+            - ./docker/mysql/data:/var/lib/mysql:rw,delegated
+        ports:
+            - "3306:3306"
+        cap_add:
+            - SYS_NICE # prevent "mbind: Operation not permitted" errors
+
+    client:
+        image: node:23-alpine
+        depends_on:
+            - api
+        expose:
+            -   80
+        volumes:
+            - ./front:/usr/src/front:rw,cached
+        command: /bin/sh -c "cd /usr/src/front && yarn install && yarn run dev --host=0.0.0.0 --port=80"
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.client.rule=Host(`client.immo.localhost`)"
+            - "traefik.http.routers.client.entrypoints=web"
