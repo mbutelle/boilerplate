@@ -23,9 +23,10 @@ services:
             - ./docker/nginx/:/etc/nginx/conf.d/:ro
             - ./api:/var/www/app
             - ./var/logs/nginx/:/var/log/nginx
+            - ./var:/var/shared
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.api.rule=Host(`api.immo.localhost`)"
+            - "traefik.http.routers.api.rule=Host(`api.boilerplate.localhost`)"
             - "traefik.http.routers.api.entrypoints=web"
 
     php:
@@ -50,7 +51,7 @@ services:
             - "8025:8025"
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.mailhog.rule=Host(`mail.immo.localhost`)"
+            - "traefik.http.routers.mailhog.rule=Host(`mail.boilerplate.localhost`)"
             - "traefik.http.routers.mailhog.entrypoints=mailhog"
 
     mysql:
@@ -58,9 +59,9 @@ services:
         command: --max_allowed_packet=32505856 --sql_mode=""
         environment:
             - MARIADB_ROOT_PASSWORD=root
-            - MARIADB_DATABASE=immo
-            - MARIADB_USER=immo
-            - MARIADB_PASSWORD=immo
+            - MARIADB_DATABASE=boilerplate
+            - MARIADB_USER=boilerplate
+            - MARIADB_PASSWORD=boilerplate
         volumes:
             - ./docker/mysql/data:/var/lib/mysql:rw,delegated
         ports:
@@ -76,9 +77,10 @@ services:
             -   80
         volumes:
             - ./front:/usr/src/front:rw,cached
+            - ./var:/var/shared
         working_dir: /usr/src/front
         command: /bin/sh -c "yarn install && yarn run dev --host=0.0.0.0 --port=80"
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.client.rule=Host(`client.immo.localhost`)"
+            - "traefik.http.routers.client.rule=Host(`client.boilerplate.localhost`)"
             - "traefik.http.routers.client.entrypoints=web"

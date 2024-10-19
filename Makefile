@@ -59,5 +59,9 @@ generate-front-services: ## use orval to generate http client
 ##
 
 php-cs-fixer: ## php cs fixer
-	${DOCKER} run --init -it --rm -v "$(pwd)/api:/project" -w /project jakzal/phpqa phpcs .
+	$(DOCKER_COMPOSE) exec -u www-data $(PHP) vendor/bin/php-cs-fixer check
 .PHONY: php-cs-fixer
+
+php-cs-fixer-fix: ## php cs fixer fix
+	$(DOCKER_COMPOSE) exec -u www-data $(PHP) vendor/bin/php-cs-fixer fix
+.PHONY: php-cs-fixer-fix
