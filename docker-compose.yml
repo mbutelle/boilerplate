@@ -76,7 +76,8 @@ services:
             -   80
         volumes:
             - ./front:/usr/src/front:rw,cached
-        command: /bin/sh -c "cd /usr/src/front && yarn install && yarn run dev --host=0.0.0.0 --port=80"
+        working_dir: /usr/src/front
+        command: /bin/sh -c "yarn install && yarn run dev --host=0.0.0.0 --port=80"
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.client.rule=Host(`client.immo.localhost`)"
