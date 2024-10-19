@@ -2,7 +2,7 @@
 DOCKER         = docker
 DOCKER_COMPOSE = docker-compose
 
-FRONT = front
+FRONT = client
 PHP = php
 
 ##
@@ -24,7 +24,7 @@ ps: ## list all containers
 
 logs: ## watch container's logs
 	$(DOCKER_COMPOSE) logs -f
-.PHONY: ps
+.PHONY: logs
 
 help:
 	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m## /[33m/'
@@ -37,11 +37,11 @@ help:
 
 front-shell: ## open shell in front container
 	$(DOCKER_COMPOSE) exec $(FRONT) sh
-.PHONY: stop
+.PHONY: front-shell
 
-php-shell: start ## open shell in php container
+php-shell: ## open shell in php container
 	$(DOCKER_COMPOSE) exec -u www-data $(PHP) bash
-.PHONY: stop
+.PHONY: php-shell
 
 ##
 ## Technical command
