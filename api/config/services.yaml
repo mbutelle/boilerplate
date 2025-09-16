@@ -1,9 +1,14 @@
-# This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
+when@dev:
+    parameters:
+        otp_sender: App\Account\Infrastructure\Symfony\Otp\Strategy\EmailOtpNotificationSenderStrategy
+        translator_class: App\Shared\Infrastructure\Symfony\Translator\DummyTranslator
 
-# Put parameters here that don't need to change on each machine where the app is deployed
-# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
-parameters:
+when@prod:
+    parameters:
+        .container.dumper.inline_factories: true
+        debug.container.dump: false
+        otp_sender: App\Account\Infrastructure\Symfony\Otp\Strategy\SmsOtpNotificationSenderStrategy
+        translator_class: App\Shared\Infrastructure\Symfony\Translator\GoogleTranslator
 
 services:
     # default configuration for services in *this* file
@@ -11,14 +16,21 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+        resource: '../src/*'
+        exclude: '../src/{Kernel.php}'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    entity_translator:
+        class: '%translator_class%'
+
+    Monolog\Processor\MemoryPeakUsageProcessor:
+        tags:
+            - { name: monolog.processor }
+
+    Monolog\Processor\MemoryUsageProcessor:
+        tags:
+            - { name: monolog.processor }
+
+    Monolog\Processor\UidProcessor:
+        tags:
+            - { name: monolog.processor }

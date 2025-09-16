@@ -1,29 +1,51 @@
 security:
+    enable_authenticator_manager: true
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        doc_user:
+            memory:
+                users:
+                    doc_user: { password: '%env(DOC_PASSWORD)%', roles: ['ROLE_DOC']} # test TODO modifier le mdp de ce user
+
+        app_user_provider:
+            entity:
+                class: App\Security\Entity\User
+                property: email
+
     firewalls:
         dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            pattern: ^/_(profiler|wdt)/
             security: false
+
+        doc:
+            pattern: ^/$
+            security: true
+            provider: doc_user
+            http_basic:
+                realm: Secured Area
+
         main:
-            lazy: true
-            provider: users_in_memory
-
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+            stateless: true
+            security: true
+            provider: app_user_provider
+            json_login:
+                check_path: /auth # The name in routes.yaml is enough for mapping
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            entry_point: jwt
+            jwt: ~
+            refresh_jwt:
+                check_path: /api/token/refresh
 
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/$, roles: ROLE_DOC }
 
 when@test:
     security:

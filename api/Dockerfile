@@ -4,6 +4,8 @@ FROM php:8.3-fpm AS api-base
 RUN mkdir -p /var/www/app
 WORKDIR /var/www/app
 
+RUN usermod -u 1000 www-data
+
 COPY . .
 
 RUN apt-get update \
@@ -18,7 +20,6 @@ RUN apt-get update \
         libonig-dev \
         git \
         curl \
-        libc-client-dev \
         libkrb5-dev \
         libmagickwand-dev --no-install-recommends \
         ssh \
@@ -40,7 +41,11 @@ RUN apt-get update \
 # Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN usermod -u 1000 www-data
 
 EXPOSE 9000
 
+COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
+RUN chmod +x /usr/local/bin/docker-entrypoint
+
+ENTRYPOINT ["docker-entrypoint"]
+CMD ["php-fpm"]

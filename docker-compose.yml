@@ -34,6 +34,8 @@ services:
             context: ./api
             target: api-base
         working_dir: /var/www/app
+        depends_on:
+            -   mysql
         environment:
             - PHP_DATE_TIMEZONE=UTC
         volumes:
@@ -56,21 +58,23 @@ services:
 
     mysql:
         image: mariadb:10.4.34
-        command: --max_allowed_packet=32505856 --sql_mode=""
+        command: >-
+            --max_allowed_packet=32505856
+            --sql_mode=""
         environment:
-            - MARIADB_ROOT_PASSWORD=root
-            - MARIADB_DATABASE=boilerplate
-            - MARIADB_USER=boilerplate
-            - MARIADB_PASSWORD=boilerplate
+            MARIADB_ROOT_PASSWORD: root
+            MARIADB_DATABASE: boilerplate
+            MARIADB_USER: boilerplate
+            MARIADB_PASSWORD: boilerplate
         volumes:
-            - ./docker/mysql/data:/var/lib/mysql:rw,delegated
+            - ./mysql_storage:/var/lib/mysql:rw,delegated
         ports:
-            - "3306:3306"
+            - "3306:3306" # MySQL port
         cap_add:
-            - SYS_NICE # prevent "mbind: Operation not permitted" errors
+            - SYS_NICE # Eviter "mbind: Operation not permitted" errors
 
     client:
-        image: node:23-alpine
+        image: node:24-alpine
         depends_on:
             - api
         expose:

@@ -1,7 +1,14 @@
-var/
+/.env
+/docker-compose.override.yaml
+.idea
 
 docker/mysql
 docker/mailhog
 
+mysql_storage
+mailhog_storage
+build
 
-.idea/
+var/
+metrics/
+tmp-phpqa/

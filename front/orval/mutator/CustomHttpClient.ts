@@ -1,56 +1,57 @@
-import Axios, {type AxiosError, type AxiosRequestConfig} from 'axios';
+import Axios, { type AxiosError, type AxiosRequestConfig } from 'axios'
+import { jwtDecode } from 'jwt-decode'
 
-const config = useRuntimeConfig();
-
-export const AXIOS_INSTANCE = Axios.create({
-    baseURL: config.public.API_URL,
-});
-
-export const CustomHttpClient = <T>(
-    config: AxiosRequestConfig,
-    options?: AxiosRequestConfig,
+export const CustomHttpClient = async <T>(
+  config: AxiosRequestConfig,
+  options?: AxiosRequestConfig,
 ): Promise<T> => {
-    const token = useCookie('token');
+  const token = useCookie('token')
+  const c = useRuntimeConfig()
 
-    if (token.value) {
-        if (!config) {
-            config = {};
-        }
+  const AXIOS_INSTANCE = Axios.create({
+    baseURL: c.public.API_URL,
+  })
 
-        if (!config.headers) {
-            if (options?.headers) {
-                config.headers = options.headers;
-            } else {
-                config.headers = {};
-            }
-        }
+  if (token.value) {
+    const decodedToken = jwtDecode(token.value) as { exp: number }
 
-        config.headers.Authorization = ['Bearer', token.value].join(' ');
+    if (Date.now() >= 1000 * decodedToken.exp) {
+
     }
 
-    const source = Axios.CancelToken.source();
-    const promise = AXIOS_INSTANCE({
-            ...config,
-            ...options,
-            cancelToken: source.token,
-        })
-            .then(({data}) => data)
-            .catch((error: AxiosError) => {
-                if (401 === error.response?.status) {
-                    token.value = null;
-                    navigateTo('/login');
-                }
+    if (!config) {
+      config = {}
+    }
 
-            })
-    ;
+    if (!config.headers) {
+      if (options?.headers) {
+        config.headers = options.headers
+      }
+      else {
+        config.headers = {}
+      }
+    }
 
-    // @ts-ignore
-    promise.cancel = () => {
-        source.cancel('Query was cancelled');
-    };
+    config.headers.Authorization = ['Bearer', token.value].join(' ')
+  }
 
-    return promise;
-};
+  const source = Axios.CancelToken.source()
+  const promise = AXIOS_INSTANCE({
+    ...config,
+    ...options,
+    cancelToken: source.token,
+  })
+    .then(({ data }) => data)
+    .catch((error: AxiosError) => {
+      if (401 === error.response?.status) {
+        token.value = null
+        navigateTo('/auth/login')
+      }
 
-export type BodyType<BodyData> = BodyData;
+      throw error
+    })
 
+  return promise
+}
+
+export type BodyType<BodyData> = BodyData
