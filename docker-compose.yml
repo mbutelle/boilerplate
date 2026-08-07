@@ -70,6 +70,68 @@ services:
             retries: 10
             start_period: 90s
 
+    # Consomme le transport asynchrone. Sans ce service, les messages partent
+    # dans la file et personne ne les traite : aucune erreur, juste des effets
+    # qui n'arrivent jamais. C'est le défaut le plus silencieux d'un socle.
+    worker:
+        extends:
+            service: api
+        image: boilerplate-api
+        # Saute l'entrypoint applicatif (composer install + migrations) : ces
+        # étapes sont déjà faites par le service api, et les refaire écrirait
+        # dans le vendor/ partagé pendant que l'api tourne.
+        entrypoint: ["docker-php-entrypoint"]
+        command: php bin/console messenger:consume async --time-limit=3600 -v
+        environment:
+            # Runtime Symfony standard, et non celui de FrankenPHP : c'est une
+            # commande console, pas un serveur HTTP.
+            - APP_RUNTIME=Symfony\Component\Runtime\SymfonyRuntime
+        depends_on:
+            api:
+                condition: service_healthy
+        labels:
+            - "traefik.enable=false"
+        volumes:
+            # var/cache en tmpfs : ses écritures ne touchent pas le bind-mount
+            # surveillé par le rechargement à chaud de l'api (qui redémarrerait
+            # en boucle), et un tmpfs reste inscriptible quel que soit l'UID.
+            # Monté en 1777 comme /tmp : un tmpfs nu naîtrait en root:755.
+            - type: tmpfs
+              target: /var/www/app/var/cache
+              tmpfs:
+                  mode: 01777
+        healthcheck:
+            disable: true
+        restart: unless-stopped
+
+    # « Cron » local. En production, ce sont des unités systemd (voir deploy/) ou
+    # un CronJob de l'orchestrateur, sur les mêmes commandes.
+    scheduler:
+        extends:
+            service: api
+        image: boilerplate-api
+        entrypoint: ["docker-php-entrypoint"]
+        command: >-
+            /bin/sh -c "while true; do
+              php bin/console gesdinet:jwt:clear;
+              sleep ${SCHEDULER_INTERVAL:-3600};
+            done"
+        environment:
+            - APP_RUNTIME=Symfony\Component\Runtime\SymfonyRuntime
+        depends_on:
+            api:
+                condition: service_healthy
+        labels:
+            - "traefik.enable=false"
+        volumes:
+            - type: tmpfs
+              target: /var/www/app/var/cache
+              tmpfs:
+                  mode: 01777
+        healthcheck:
+            disable: true
+        restart: unless-stopped
+
     database:
         image: mysql:8.0
         command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci

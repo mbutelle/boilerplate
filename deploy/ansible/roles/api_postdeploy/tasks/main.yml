@@ -1,0 +1,31 @@
+---
+- name: Jouer les migrations Doctrine
+  ansible.builtin.command:
+    cmd: php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+    chdir: "{{ current_link }}"
+  environment:
+    APP_ENV: prod
+  when: migrate | bool
+  # Une migration modifie le schéma par nature : la déclarer « changed » est
+  # exact, et évite le faux « ok » qu'ansible afficherait sinon.
+  changed_when: true
+
+- name: Préchauffer le cache de production
+  ansible.builtin.command:
+    cmd: "php bin/console {{ item }}"
+    chdir: "{{ current_link }}"
+  environment:
+    APP_ENV: prod
+  loop:
+    - cache:clear --no-warmup
+    - cache:warmup
+  changed_when: true
+
+- name: Vérifier que l'application répond
+  ansible.builtin.uri:
+    url: "{{ health_url }}"
+    status_code: 200
+  retries: 10
+  delay: 3
+  register: api_postdeploy_health
+  until: api_postdeploy_health is succeeded

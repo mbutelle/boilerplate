@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Symfony\Messenger;
 
+use App\Shared\Infrastructure\Message\MessageBusInterface as AppMessageBusInterface;
 use App\Shared\Infrastructure\Message\MessageInterface;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-final class MessengerMessageBus
+final class MessengerMessageBus implements AppMessageBusInterface
 {
     private MessageBusInterface $messageBus;
 

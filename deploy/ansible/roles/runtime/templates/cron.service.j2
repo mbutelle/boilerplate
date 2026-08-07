@@ -1,0 +1,12 @@
+[Unit]
+Description={{ app_name }} — commandes planifiées ({{ env }})
+
+[Service]
+Type=oneshot
+User={{ ansible_user }}
+WorkingDirectory={{ current_link }}
+Environment=APP_ENV=prod
+
+{% for command in scheduled_commands %}
+ExecStart=/usr/bin/env php bin/console {{ command }}
+{% endfor %}

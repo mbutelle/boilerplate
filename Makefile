@@ -167,3 +167,37 @@ build-api: ## construire l'image applicative (ENV=staging|production)
 build-front: ## construire le front (ENV=staging|production)
 	$(DOCKER_COMPOSE) run --rm --no-deps $(FRONT) pnpm build
 .PHONY: build-front
+
+##
+## Déploiement
+## -------
+##
+
+ANSIBLE_DIR = deploy/ansible
+VAULT       = ansible-vault
+VAULT_FILE  = $(ANSIBLE_DIR)/group_vars/vault.yml
+ENV        ?= staging
+APP        ?= api
+ASK_VAULT   = --ask-vault-pass
+
+deploy: ## déployer une application (APP= ENV=)
+	cd $(ANSIBLE_DIR) && ansible-playbook deploy.yml -i inventories/$(ENV).ini -l $(APP) -e env=$(ENV) -e app=$(APP) $(ASK_VAULT)
+.PHONY: deploy
+
+deploy-all: ## déployer tout l'inventaire (ENV=)
+	cd $(ANSIBLE_DIR) && ansible-playbook deploy.yml -i inventories/$(ENV).ini -e env=$(ENV) $(ASK_VAULT)
+.PHONY: deploy-all
+
+migrate-remote: ## jouer les migrations seules (ENV=)
+	cd $(ANSIBLE_DIR) && ansible-playbook deploy.yml -i inventories/$(ENV).ini -l api -e env=$(ENV) -e app=api $(ASK_VAULT)
+.PHONY: migrate-remote
+
+vault-create: ## créer le coffre chiffré
+	$(VAULT) create $(VAULT_FILE)
+vault-edit: ## éditer le coffre chiffré
+	$(VAULT) edit $(VAULT_FILE)
+vault-view: ## afficher le coffre chiffré
+	$(VAULT) view $(VAULT_FILE)
+vault-rekey: ## changer le mot de passe du coffre
+	$(VAULT) rekey $(VAULT_FILE)
+.PHONY: vault-create vault-edit vault-view vault-rekey

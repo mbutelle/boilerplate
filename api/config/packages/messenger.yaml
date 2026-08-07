@@ -1,6 +1,26 @@
 framework:
     messenger:
         default_bus: 'command.bus'
+
+        transports:
+            # Transport Doctrine : la base est déjà là, aucune extension PHP ni
+            # service supplémentaire à provisionner. auto_setup crée la table
+            # messenger_messages au besoin.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+
+        # NE PAS router d'événement (event.bus) vers `async` : un événement de
+        # domaine porte l'entité concernée, qui ne se sérialise pas. Les
+        # événements restent synchrones, publiés après la transaction ; ce qui
+        # part en asynchrone est un MESSAGE dédié ne transportant que des
+        # scalaires — voir SendAccountCreatedEmail.
+        routing:
+            App\IAM\Infrastructure\Message\SendAccountCreatedEmail: async
+
         buses:
             command.bus:
                 middleware:

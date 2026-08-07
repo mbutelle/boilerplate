@@ -1,0 +1,12 @@
+[Unit]
+Description={{ app_name }} — déclencheur des commandes planifiées ({{ env }})
+
+[Timer]
+OnCalendar={{ scheduler_on_calendar }}
+# Rattrape un déclenchement manqué (machine éteinte, redémarrage) au lieu
+# d'attendre la prochaine occurrence.
+Persistent=true
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

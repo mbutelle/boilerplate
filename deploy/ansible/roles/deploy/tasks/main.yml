@@ -1,0 +1,64 @@
+---
+# Déploiement par releases datées, avec un lien `current` basculé en une seule
+# opération. Le basculement atomique évite la fenêtre pendant laquelle des
+# fichiers de deux versions coexisteraient sous le même chemin.
+
+- name: Créer l'arborescence de base
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ deploy_base }}/releases"
+    - "{{ deploy_base }}/shared"
+    - "{{ deploy_base }}/shared/var/log"
+
+- name: Créer le dossier de la release
+  ansible.builtin.file:
+    path: "{{ release_dir }}"
+    state: directory
+    mode: "0755"
+
+- name: Téléverser et extraire l'archive
+  ansible.builtin.unarchive:
+    src: "{{ artifact_path }}"
+    dest: "{{ release_dir }}"
+
+- name: Rendre le .env depuis le coffre
+  ansible.builtin.template:
+    src: api.env.j2
+    dest: "{{ deploy_base }}/shared/.env.local"
+    mode: "0640"
+
+- name: Lier les éléments partagés dans la release
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+    force: true
+  loop:
+    - { src: "{{ deploy_base }}/shared/.env.local", dest: "{{ release_dir }}/.env.local" }
+    - { src: "{{ deploy_base }}/shared/var/log", dest: "{{ release_dir }}/var/log" }
+
+- name: Basculer current vers la nouvelle release
+  ansible.builtin.file:
+    src: "{{ release_dir }}"
+    dest: "{{ current_link }}"
+    state: link
+    force: true
+
+- name: Lister les anciennes releases au-delà du seuil conservé
+  ansible.builtin.shell:
+    # pipefail : sans lui, l'échec de `ls` est masqué par le succès de `tail`, et
+    # la tâche rend une liste vide en se déclarant satisfaite.
+    cmd: "set -o pipefail && ls -1dt {{ deploy_base }}/releases/*/ | tail -n +{{ keep_releases + 1 }}"
+    executable: /bin/bash
+  register: deploy_old_releases
+  changed_when: false
+  failed_when: false
+
+- name: Purger les anciennes releases
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ deploy_old_releases.stdout_lines | default([]) }}"

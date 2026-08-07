@@ -1,0 +1,20 @@
+---
+app_name: boilerplate
+
+deploy_base: "/home/{{ ansible_user }}/{{ app_name }}"
+release_dir: "{{ deploy_base }}/releases/{{ release_name }}"
+current_link: "{{ deploy_base }}/current"
+artifact_path: "{{ playbook_dir }}/../../build/archive-{{ app }}.tar.gz"
+
+keep_releases: 5
+migrate: true
+
+health_url: "https://api.example.test/health"
+
+# Commandes exécutées par le déclencheur planifié. Les ajouter ici SUFFIT :
+# l'unité systemd est rendue depuis cette liste.
+scheduled_commands:
+  - gesdinet:jwt:clear
+
+# Syntaxe systemd OnCalendar. `hourly` = au début de chaque heure.
+scheduler_on_calendar: hourly

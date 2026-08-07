@@ -1,0 +1,69 @@
+---
+# Provisionne ce qui fait tourner l'application EN DEHORS des requêtes HTTP.
+#
+# C'est le rôle que le socle d'origine n'avait pas, et son absence est
+# silencieuse : les messages partent dans le transport et personne ne les
+# consomme, les commandes planifiées ne se déclenchent jamais. Aucune erreur,
+# juste des effets qui n'arrivent pas.
+
+- name: Installer l'unité du worker Messenger
+  become: true
+  ansible.builtin.template:
+    src: worker.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}-worker.service"
+    mode: "0644"
+  notify: Recharger systemd
+
+- name: Installer l'unité des commandes planifiées
+  become: true
+  ansible.builtin.template:
+    src: cron.service.j2
+    dest: "/etc/systemd/system/{{ app_name }}-cron.service"
+    mode: "0644"
+  notify: Recharger systemd
+
+- name: Installer le déclencheur des commandes planifiées
+  become: true
+  ansible.builtin.template:
+    src: cron.timer.j2
+    dest: "/etc/systemd/system/{{ app_name }}-cron.timer"
+    mode: "0644"
+  notify: Recharger systemd
+
+- name: Recharger systemd maintenant
+  become: true
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Activer et redémarrer le worker
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ app_name }}-worker.service"
+    enabled: true
+    # Redémarré à chaque déploiement : sans ça, le worker continue d'exécuter le
+    # code de la release précédente, puisque son processus a démarré dessus.
+    state: restarted
+
+- name: Activer le déclencheur planifié
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ app_name }}-cron.timer"
+    enabled: true
+    state: started
+
+- name: Relever l'état du worker
+  become: true
+  ansible.builtin.systemd:
+    name: "{{ app_name }}-worker.service"
+  register: runtime_worker_state
+
+- name: Échouer si le worker ne tourne pas
+  # Un déploiement qui laisse le worker éteint doit échouer bruyamment plutôt
+  # que de rendre la main en donnant l'illusion que tout va bien.
+  ansible.builtin.assert:
+    that:
+      - runtime_worker_state.status.ActiveState == 'active'
+    fail_msg: >-
+      Le worker Messenger n'est pas actif après déploiement
+      ({{ runtime_worker_state.status.ActiveState }}) : les messages
+      s'accumuleraient dans le transport sans que rien ne les consomme.

@@ -1,0 +1,25 @@
+[Unit]
+Description={{ app_name }} — consommateur Messenger ({{ env }})
+After=network.target
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+WorkingDirectory={{ current_link }}
+Environment=APP_ENV=prod
+
+# --time-limit fait sortir le worker proprement au bout d'une heure ; systemd le
+# relance aussitôt. C'est ce qui évite qu'un processus PHP de longue durée
+# accumule de la mémoire et parte sur un code applicatif devenu obsolète après
+# un déploiement.
+ExecStart=/usr/bin/env php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M
+
+Restart=always
+RestartSec=5
+
+# Un worker qui échoue en boucle ne doit pas être abandonné par systemd :
+# StartLimitBurst=0 désactive le seuil au-delà duquel l'unité reste éteinte.
+StartLimitBurst=0
+
+[Install]
+WantedBy=multi-user.target

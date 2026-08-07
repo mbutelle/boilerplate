@@ -1,0 +1,22 @@
+---
+- name: Déployer le socle
+  hosts: "{{ env | default('staging') }}"
+  gather_facts: true
+
+  pre_tasks:
+    # Le nom de release est figé une seule fois. Un `vars` de niveau play avec un
+    # lookup `date` serait réévalué à chaque référence, et les tâches
+    # « créer le dossier » et « extraire dedans » viseraient deux horodatages
+    # différents. set_fact évalue le lookup une fois et garde la chaîne.
+    - name: Figer le nom de la release
+      ansible.builtin.set_fact:
+        release_name: "{{ lookup('pipe', 'date +%Y%m%d-%H%M%S') }}"
+
+  roles:
+    - deploy
+    - role: api_postdeploy
+      when: app == 'api'
+    # Le runtime vient APRÈS le basculement de `current` : le worker redémarre
+    # donc sur le code de la nouvelle release, et non sur celui de l'ancienne.
+    - role: runtime
+      when: app == 'api'
