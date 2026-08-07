@@ -1,16 +1,16 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import {
-  getApiUsersGetCollectionQueryKey,
-  useApiUsersIdDelete,
+  getListUsersQueryKey,
+  useDeleteUser,
 } from '@bp/api-client/api/user/user'
 
 export default () => {
   const queryClient = useQueryClient()
 
-  const mutation = useApiUsersIdDelete({
+  const mutation = useDeleteUser({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getApiUsersGetCollectionQueryKey() })
+        queryClient.invalidateQueries({ queryKey: getListUsersQueryKey() })
       },
     },
   })

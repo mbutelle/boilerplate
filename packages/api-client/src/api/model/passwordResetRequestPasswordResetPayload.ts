@@ -5,12 +5,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * Ressource sans modèle de domaine derrière : les deux opérations ne projettent
- * rien (204), elles ne font que dispatcher une commande. C'est pour cette raison
- * qu'elle n'implémente pas ResourceInterface — il n'y a pas de fromDomain() qui
- * ait un sens ici.
- */
 export interface PasswordResetRequestPasswordResetPayload {
   /** @nullable */
   email: string | null;

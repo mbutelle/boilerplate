@@ -15,7 +15,14 @@ final class ChangePasswordPayload implements CommandableInterface
     public function __construct(
         #[ApiProperty(readable: false)]
         #[Assert\NotBlank]
-        #[Assert\Length(min: 8)]
+        // Mêmes exigences que la réinitialisation : la règle est définie une fois
+        // et réutilisée, sinon les deux chemins de changement de mot de passe
+        // finissent par diverger.
+        #[Assert\Length(min: ResetPasswordPayload::MIN_LENGTH)]
+        #[Assert\Regex(
+            pattern: ResetPasswordPayload::PATTERN,
+            message: 'Le mot de passe doit contenir une majuscule, une minuscule, un chiffre et un caractère spécial.',
+        )]
         public ?string $password = null,
     ) {
     }

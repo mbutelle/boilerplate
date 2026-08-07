@@ -30,12 +30,12 @@ import type {
 } from 'vue';
 
 import type {
-  ApiProductsGetCollection200,
-  ApiProductsGetCollectionParams,
   ConstraintViolation,
   ConstraintViolationJsonld,
   Error,
   ErrorJsonld,
+  ListProducts200,
+  ListProductsParams,
   ProductCreateProductPayload,
   ProductJsonld,
   ProductPublishProductPayload,
@@ -58,13 +58,13 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * Retrieves the collection of Product resources.
  * @summary Retrieves the collection of Product resources.
  */
-export const apiProductsGetCollection = (
-    params?: MaybeRefOrGetter<ApiProductsGetCollectionParams>,
+export const listProducts = (
+    params?: MaybeRefOrGetter<ListProductsParams>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
       params = toValue(params);
 
-      return CustomHttpClient<ApiProductsGetCollection200>(
+      return CustomHttpClient<ListProducts200>(
       {url: `/products`, method: 'GET',
         params, signal
     },
@@ -74,45 +74,45 @@ export const apiProductsGetCollection = (
 
 
 
-export const getApiProductsGetCollectionQueryKey = (params?: MaybeRefOrGetter<ApiProductsGetCollectionParams>,) => {
+export const getListProductsQueryKey = (params?: MaybeRefOrGetter<ListProductsParams>,) => {
     return [
     'products', ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getApiProductsGetCollectionQueryOptions = <TData = Awaited<ReturnType<typeof apiProductsGetCollection>>, TError = unknown>(params?: MaybeRefOrGetter<ApiProductsGetCollectionParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiProductsGetCollection>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export const getListProductsQueryOptions = <TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(params?: MaybeRefOrGetter<ListProductsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getApiProductsGetCollectionQueryKey(params);
+  const queryKey =  getListProductsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof apiProductsGetCollection>>> = ({ signal }) => apiProductsGetCollection(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listProducts>>> = ({ signal }) => listProducts(params, requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof apiProductsGetCollection>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>
 }
 
-export type ApiProductsGetCollectionQueryResult = NonNullable<Awaited<ReturnType<typeof apiProductsGetCollection>>>
-export type ApiProductsGetCollectionQueryError = unknown
+export type ListProductsQueryResult = NonNullable<Awaited<ReturnType<typeof listProducts>>>
+export type ListProductsQueryError = unknown
 
 
 /**
  * @summary Retrieves the collection of Product resources.
  */
 
-export function useApiProductsGetCollection<TData = Awaited<ReturnType<typeof apiProductsGetCollection>>, TError = unknown>(
- params?: MaybeRefOrGetter<ApiProductsGetCollectionParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiProductsGetCollection>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
+ params?: MaybeRefOrGetter<ListProductsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApiProductsGetCollectionQueryOptions(params,options)
+  const queryOptions = getListProductsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -130,7 +130,7 @@ export function useApiProductsGetCollection<TData = Awaited<ReturnType<typeof ap
  * Creates a Product resource.
  * @summary Creates a Product resource.
  */
-export const apiProductsPost = (
+export const createProduct = (
     productCreateProductPayload: MaybeRefOrGetter<ProductCreateProductPayload>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -147,11 +147,11 @@ export const apiProductsPost = (
 
 
 
-export const getApiProductsPostMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsPost>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiProductsPost>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext> => {
+export const getCreateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext> => {
 
-const mutationKey = ['apiProductsPost'];
+const mutationKey = ['createProduct'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -161,10 +161,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiProductsPost>>, {data: BodyType<ProductCreateProductPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProduct>>, {data: BodyType<ProductCreateProductPayload>}> = (props) => {
           const {data} = props ?? {};
 
-          return  apiProductsPost(data,requestOptions)
+          return  createProduct(data,requestOptions)
         }
 
 
@@ -174,28 +174,28 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiProductsPostMutationResult = NonNullable<Awaited<ReturnType<typeof apiProductsPost>>>
-    export type ApiProductsPostMutationBody = BodyType<ProductCreateProductPayload>
-    export type ApiProductsPostMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type CreateProductMutationResult = NonNullable<Awaited<ReturnType<typeof createProduct>>>
+    export type CreateProductMutationBody = BodyType<ProductCreateProductPayload>
+    export type CreateProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
 
     /**
  * @summary Creates a Product resource.
  */
-export const useApiProductsPost = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsPost>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useCreateProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiProductsPost>>,
+        Awaited<ReturnType<typeof createProduct>>,
         TError,
         {data: BodyType<ProductCreateProductPayload>},
         TContext
       > => {
-      return useMutation(getApiProductsPostMutationOptions(options), queryClient);
+      return useMutation(getCreateProductMutationOptions(options), queryClient);
     }
     /**
  * Retrieves a Product resource.
  * @summary Retrieves a Product resource.
  */
-export const apiProductsIdGet = (
+export const getProduct = (
     id: MaybeRefOrGetter<string>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -210,45 +210,45 @@ export const apiProductsIdGet = (
 
 
 
-export const getApiProductsIdGetQueryKey = (id: MaybeRefOrGetter<string>,) => {
+export const getGetProductQueryKey = (id: MaybeRefOrGetter<string>,) => {
     return [
     'products',id
     ] as const;
     }
 
 
-export const getApiProductsIdGetQueryOptions = <TData = Awaited<ReturnType<typeof apiProductsIdGet>>, TError = ErrorJsonld | Error>(id: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiProductsIdGet>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export const getGetProductQueryOptions = <TData = Awaited<ReturnType<typeof getProduct>>, TError = ErrorJsonld | Error>(id: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getApiProductsIdGetQueryKey(id);
+  const queryKey =  getGetProductQueryKey(id);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof apiProductsIdGet>>> = ({ signal }) => apiProductsIdGet(id, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getProduct>>> = ({ signal }) => getProduct(id, requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: computed(() => toValue(id) !== null && toValue(id) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof apiProductsIdGet>>, TError, TData>
+   return  { queryKey, queryFn, enabled: computed(() => toValue(id) !== null && toValue(id) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>
 }
 
-export type ApiProductsIdGetQueryResult = NonNullable<Awaited<ReturnType<typeof apiProductsIdGet>>>
-export type ApiProductsIdGetQueryError = ErrorJsonld | Error
+export type GetProductQueryResult = NonNullable<Awaited<ReturnType<typeof getProduct>>>
+export type GetProductQueryError = ErrorJsonld | Error
 
 
 /**
  * @summary Retrieves a Product resource.
  */
 
-export function useApiProductsIdGet<TData = Awaited<ReturnType<typeof apiProductsIdGet>>, TError = ErrorJsonld | Error>(
- id: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiProductsIdGet>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = ErrorJsonld | Error>(
+ id: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApiProductsIdGetQueryOptions(id,options)
+  const queryOptions = getGetProductQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -266,7 +266,7 @@ export function useApiProductsIdGet<TData = Awaited<ReturnType<typeof apiProduct
  * Removes the Product resource.
  * @summary Removes the Product resource.
  */
-export const apiProductsIdDelete = (
+export const deleteProduct = (
     id: MaybeRefOrGetter<string>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -281,11 +281,11 @@ export const apiProductsIdDelete = (
 
 
 
-export const getApiProductsIdDeleteMutationOptions = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdDelete>>, TError,{id: string}, TContext> => {
+export const getDeleteProductMutationOptions = <TError = ErrorJsonld | Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext> => {
 
-const mutationKey = ['apiProductsIdDelete'];
+const mutationKey = ['deleteProduct'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -295,10 +295,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiProductsIdDelete>>, {id: string}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProduct>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  apiProductsIdDelete(id,requestOptions)
+          return  deleteProduct(id,requestOptions)
         }
 
 
@@ -308,28 +308,28 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiProductsIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof apiProductsIdDelete>>>
+    export type DeleteProductMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProduct>>>
 
-    export type ApiProductsIdDeleteMutationError = ErrorJsonld | Error
+    export type DeleteProductMutationError = ErrorJsonld | Error
 
     /**
  * @summary Removes the Product resource.
  */
-export const useApiProductsIdDelete = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useDeleteProduct = <TError = ErrorJsonld | Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiProductsIdDelete>>,
+        Awaited<ReturnType<typeof deleteProduct>>,
         TError,
         {id: string},
         TContext
       > => {
-      return useMutation(getApiProductsIdDeleteMutationOptions(options), queryClient);
+      return useMutation(getDeleteProductMutationOptions(options), queryClient);
     }
     /**
  * Updates the Product resource.
  * @summary Updates the Product resource.
  */
-export const apiProductsIdPatch = (
+export const updateProduct = (
     id: MaybeRefOrGetter<string>,
     productUpdateProductPayloadJsonMergePatch: MaybeRefOrGetter<ProductUpdateProductPayloadJsonMergePatch>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
@@ -348,11 +348,11 @@ productUpdateProductPayloadJsonMergePatch = toValue(productUpdateProductPayloadJ
 
 
 
-export const getApiProductsIdPatchMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdPatch>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdPatch>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext> => {
+export const getUpdateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext> => {
 
-const mutationKey = ['apiProductsIdPatch'];
+const mutationKey = ['updateProduct'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -362,10 +362,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiProductsIdPatch>>, {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProduct>>, {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  apiProductsIdPatch(id,data,requestOptions)
+          return  updateProduct(id,data,requestOptions)
         }
 
 
@@ -375,28 +375,28 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiProductsIdPatchMutationResult = NonNullable<Awaited<ReturnType<typeof apiProductsIdPatch>>>
-    export type ApiProductsIdPatchMutationBody = BodyType<ProductUpdateProductPayloadJsonMergePatch>
-    export type ApiProductsIdPatchMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type UpdateProductMutationResult = NonNullable<Awaited<ReturnType<typeof updateProduct>>>
+    export type UpdateProductMutationBody = BodyType<ProductUpdateProductPayloadJsonMergePatch>
+    export type UpdateProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
 
     /**
  * @summary Updates the Product resource.
  */
-export const useApiProductsIdPatch = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdPatch>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useUpdateProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiProductsIdPatch>>,
+        Awaited<ReturnType<typeof updateProduct>>,
         TError,
         {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>},
         TContext
       > => {
-      return useMutation(getApiProductsIdPatchMutationOptions(options), queryClient);
+      return useMutation(getUpdateProductMutationOptions(options), queryClient);
     }
     /**
  * Creates a Product resource.
  * @summary Creates a Product resource.
  */
-export const apiProductsIdpublishPost = (
+export const publishProduct = (
     id: MaybeRefOrGetter<string>,
     productPublishProductPayload: MaybeRefOrGetter<ProductPublishProductPayload>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
@@ -415,11 +415,11 @@ productPublishProductPayload = toValue(productPublishProductPayload);
 
 
 
-export const getApiProductsIdpublishPostMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdpublishPost>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdpublishPost>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext> => {
+export const getPublishProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext> => {
 
-const mutationKey = ['apiProductsIdpublishPost'];
+const mutationKey = ['publishProduct'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -429,10 +429,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiProductsIdpublishPost>>, {id: string;data: BodyType<ProductPublishProductPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishProduct>>, {id: string;data: BodyType<ProductPublishProductPayload>}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  apiProductsIdpublishPost(id,data,requestOptions)
+          return  publishProduct(id,data,requestOptions)
         }
 
 
@@ -442,20 +442,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiProductsIdpublishPostMutationResult = NonNullable<Awaited<ReturnType<typeof apiProductsIdpublishPost>>>
-    export type ApiProductsIdpublishPostMutationBody = BodyType<ProductPublishProductPayload>
-    export type ApiProductsIdpublishPostMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type PublishProductMutationResult = NonNullable<Awaited<ReturnType<typeof publishProduct>>>
+    export type PublishProductMutationBody = BodyType<ProductPublishProductPayload>
+    export type PublishProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
 
     /**
  * @summary Creates a Product resource.
  */
-export const useApiProductsIdpublishPost = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiProductsIdpublishPost>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const usePublishProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiProductsIdpublishPost>>,
+        Awaited<ReturnType<typeof publishProduct>>,
         TError,
         {id: string;data: BodyType<ProductPublishProductPayload>},
         TContext
       > => {
-      return useMutation(getApiProductsIdpublishPostMutationOptions(options), queryClient);
+      return useMutation(getPublishProductMutationOptions(options), queryClient);
     }

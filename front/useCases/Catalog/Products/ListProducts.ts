@@ -1,14 +1,21 @@
 import { computed, type Ref } from 'vue'
-import { useApiProductsGetCollection } from '@bp/api-client/api/product/product'
-import type { ApiProductsGetCollectionParams } from '@bp/api-client/api/model'
+import { useListProducts } from '@bp/api-client/api/product/product'
+import { ListProductsResponse } from '@bp/api-client/api/product/product.zod'
+import type { ListProductsParams } from '@bp/api-client/api/model'
 
 /**
  * Les paramètres sont typés par le SDK, donc par ce que l'API déclare vraiment.
  * Un filtre ou un champ de tri inventé côté front ne compile pas — c'est l'effet
  * recherché en déclarant les paramètres sur l'opération API Platform.
  */
-export default (params: Ref<ApiProductsGetCollectionParams>) => {
-  const query = useApiProductsGetCollection(params)
+export default (params: Ref<ListProductsParams>) => {
+  const query = useListProducts(params, {
+    query: {
+      // La validation passe par `select` : vue-query ne l'exécute que sur une
+      // réponse fraîche, pas à chaque lecture du cache.
+      select: data => validateResponse(ListProductsResponse, data, 'GET /products'),
+    },
+  })
 
   return {
     ...query,

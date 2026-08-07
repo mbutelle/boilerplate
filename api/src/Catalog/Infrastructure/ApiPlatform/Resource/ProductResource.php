@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\QueryParameter;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\Catalog\Application\Command\DeleteProduct\DeleteProductCommand;
 use App\Catalog\Domain\Model\Product;
 use App\Catalog\Infrastructure\ApiPlatform\Payload\CreateProductPayload;
@@ -24,17 +25,19 @@ use App\Shared\Application\Command\CommandInterface;
 use App\Shared\Infrastructure\ApiPlatform\Resource\ResourceInterface;
 use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
 
-/**
- * Contexte d'exemple : c'est la référence à copier pour un nouveau contexte
- * métier. Les cinq écritures passent par ApplyCommandProcessor, les paramètres
- * de collection sont déclarés ici — donc présents dans l'OpenAPI, donc dans le
- * SDK des fronts.
- */
+// Note interne, volontairement PAS en PHPDoc : elle serait publiée comme
+// `description` du schéma OpenAPI (voir PasswordResetResource).
+//
+// Contexte d'exemple : c'est la référence à copier pour un nouveau contexte
+// métier. Les cinq écritures passent par ApplyCommandProcessor, les paramètres
+// de collection sont déclarés ici — donc présents dans l'OpenAPI, donc dans le
+// SDK des fronts.
 #[ApiResource(
     shortName: 'Product',
     operations: [
         new GetCollection(
             uriTemplate: '/products',
+            openapi: new OpenApiOperation(operationId: 'listProducts'),
             provider: ProductCollectionProvider::class,
             // ApplyPageToQueryTrait lit itemsPerPage dans $context['filters'] :
             // sans cette ligne le paramètre est lu mais jamais publié, donc absent
@@ -65,16 +68,19 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
         ),
         new Get(
             uriTemplate: '/products/{id}',
+            openapi: new OpenApiOperation(operationId: 'getProduct'),
             provider: ProductItemProvider::class,
         ),
         new Post(
             uriTemplate: '/products',
+            openapi: new OpenApiOperation(operationId: 'createProduct'),
             security: "is_granted('ROLE_ADMIN')",
             input: CreateProductPayload::class,
             processor: ApplyCommandProcessor::class,
         ),
         new Patch(
             uriTemplate: '/products/{id}',
+            openapi: new OpenApiOperation(operationId: 'updateProduct'),
             security: "is_granted('ROLE_ADMIN')",
             input: UpdateProductPayload::class,
             provider: ProductItemProvider::class,
@@ -82,12 +88,14 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
         ),
         new Post(
             uriTemplate: '/products/{id}/publish',
+            openapi: new OpenApiOperation(operationId: 'publishProduct'),
             security: "is_granted('ROLE_ADMIN')",
             input: PublishProductPayload::class,
             processor: ApplyCommandProcessor::class,
         ),
         new Delete(
             uriTemplate: '/products/{id}',
+            openapi: new OpenApiOperation(operationId: 'deleteProduct'),
             security: "is_granted('ROLE_ADMIN')",
             provider: ProductItemProvider::class,
             processor: ApplyCommandProcessor::class,

@@ -2,18 +2,18 @@
 import { computed, ref, watch } from 'vue'
 import ListProducts from '~/useCases/Catalog/Products/ListProducts'
 import PublishProduct from '~/useCases/Catalog/Products/PublishProduct'
-import type { ApiProductsGetCollectionParams } from '@bp/api-client/api/model'
+import type { ListProductsParams } from '@bp/api-client/api/model'
 
 definePageMeta({ layout: 'default' })
 
 const search = ref('')
-const status = ref<ApiProductsGetCollectionParams['status']>(undefined)
+const status = ref<ListProductsParams['status']>(undefined)
 const page = ref(1)
 
 // Les paramètres sont une ref : vue-query relance la requête quand ils changent,
 // et la pagination reste côté serveur. Filtrer un tableau déjà chargé dans le
 // navigateur ne tient que sur un jeu de démonstration.
-const params = computed<ApiProductsGetCollectionParams>(() => ({
+const params = computed<ListProductsParams>(() => ({
   'page': page.value,
   'itemsPerPage': 20,
   'query': search.value || undefined,

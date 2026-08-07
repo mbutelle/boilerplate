@@ -5,10 +5,10 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type ApiProductsGetCollectionStatus = typeof ApiProductsGetCollectionStatus[keyof typeof ApiProductsGetCollectionStatus];
+export type ListProductsStatus = typeof ListProductsStatus[keyof typeof ListProductsStatus];
 
 
-export const ApiProductsGetCollectionStatus = {
+export const ListProductsStatus = {
   draft: 'draft',
   published: 'published',
   archived: 'archived',

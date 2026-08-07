@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
-import { helpers, required, sameAs, minLength } from '@vuelidate/validators'
+import { helpers, required, sameAs } from '@vuelidate/validators'
+import {
+  ResetPasswordBody,
+  resetPasswordBodyPasswordMin,
+} from '@bp/api-client/api/password-reset/password-reset.zod'
 import ResetPassword from '~/useCases/IAM/Auth/ResetPassword'
 import FloatingConfigurator from '~/components/FloatingConfigurator.vue'
 import { useRoute } from '#vue-router'
@@ -30,15 +34,19 @@ const resetPasswordRequest = reactive<resetPasswordRequest>({})
 
 const isLoading = ref<boolean>(false)
 
+// La règle de mot de passe n'est plus écrite ici : elle vient du schéma zod
+// dérivé du contrat OpenAPI, donc des contraintes réellement appliquées par
+// l'API. Avant, le formulaire exigeait 12 caractères et quatre classes tandis
+// que l'API en acceptait 8 — deux règles écrites deux fois qui avaient divergé.
+const matchesApiContract = helpers.withMessage(
+  `Au moins ${resetPasswordBodyPasswordMin} caractères, avec majuscule, minuscule, chiffre et caractère spécial.`,
+  (value: string | undefined) => ResetPasswordBody.safeParse({ password: value ?? null }).success,
+)
+
 const rules = computed(() => ({
   password: {
     required: helpers.withMessage('Le mot de passe est obligatoire', required),
-    uppercase: helpers.withMessage('Au moins une majuscule', helpers.regex(/[A-Z]/)),
-    lowercase: helpers.withMessage('Au moins une minuscule', helpers.regex(/[a-z]/)),
-    numeric: helpers.withMessage('Au moins un chiffre', helpers.regex(/\d+/)),
-    special: helpers.withMessage('Au moins un caractère spécial', helpers.regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/)),
-    min: helpers.withMessage('Le mot de passe doit comporter au moins 12 caractères', minLength(12)),
-
+    contract: matchesApiContract,
   },
   password_confirmation: {
     required: helpers.withMessage('La confirmation du mot de passe est obligatoire', required),

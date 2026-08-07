@@ -1,17 +1,17 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import {
-  getApiProductsGetCollectionQueryKey,
-  useApiProductsPost,
+  getListProductsQueryKey,
+  useCreateProduct,
 } from '@bp/api-client/api/product/product'
 import type { ProductCreateProductPayload } from '@bp/api-client/api/model'
 
 export default () => {
   const queryClient = useQueryClient()
 
-  const mutation = useApiProductsPost({
+  const mutation = useCreateProduct({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getApiProductsGetCollectionQueryKey() })
+        queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() })
       },
     },
   })

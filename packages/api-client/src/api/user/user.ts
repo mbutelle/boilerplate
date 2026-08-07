@@ -29,12 +29,12 @@ import type {
 } from 'vue';
 
 import type {
-  ApiUsersGetCollection200,
-  ApiUsersGetCollectionParams,
   ConstraintViolation,
   ConstraintViolationJsonld,
   Error,
   ErrorJsonld,
+  ListUsers200,
+  ListUsersParams,
   UserChangePasswordPayloadJsonMergePatch,
   UserCreateAdminPayload,
   UserJsonld
@@ -56,13 +56,13 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
  * Retrieves the collection of User resources.
  * @summary Retrieves the collection of User resources.
  */
-export const apiUsersGetCollection = (
-    params?: MaybeRefOrGetter<ApiUsersGetCollectionParams>,
+export const listUsers = (
+    params?: MaybeRefOrGetter<ListUsersParams>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
       params = toValue(params);
 
-      return CustomHttpClient<ApiUsersGetCollection200>(
+      return CustomHttpClient<ListUsers200>(
       {url: `/users`, method: 'GET',
         params, signal
     },
@@ -72,45 +72,45 @@ export const apiUsersGetCollection = (
 
 
 
-export const getApiUsersGetCollectionQueryKey = (params?: MaybeRefOrGetter<ApiUsersGetCollectionParams>,) => {
+export const getListUsersQueryKey = (params?: MaybeRefOrGetter<ListUsersParams>,) => {
     return [
     'users', ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getApiUsersGetCollectionQueryOptions = <TData = Awaited<ReturnType<typeof apiUsersGetCollection>>, TError = ErrorJsonld | Error>(params?: MaybeRefOrGetter<ApiUsersGetCollectionParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiUsersGetCollection>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export const getListUsersQueryOptions = <TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorJsonld | Error>(params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getApiUsersGetCollectionQueryKey(params);
+  const queryKey =  getListUsersQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof apiUsersGetCollection>>> = ({ signal }) => apiUsersGetCollection(params, requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listUsers>>> = ({ signal }) => listUsers(params, requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof apiUsersGetCollection>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>
 }
 
-export type ApiUsersGetCollectionQueryResult = NonNullable<Awaited<ReturnType<typeof apiUsersGetCollection>>>
-export type ApiUsersGetCollectionQueryError = ErrorJsonld | Error
+export type ListUsersQueryResult = NonNullable<Awaited<ReturnType<typeof listUsers>>>
+export type ListUsersQueryError = ErrorJsonld | Error
 
 
 /**
  * @summary Retrieves the collection of User resources.
  */
 
-export function useApiUsersGetCollection<TData = Awaited<ReturnType<typeof apiUsersGetCollection>>, TError = ErrorJsonld | Error>(
- params?: MaybeRefOrGetter<ApiUsersGetCollectionParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiUsersGetCollection>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export function useListUsers<TData = Awaited<ReturnType<typeof listUsers>>, TError = ErrorJsonld | Error>(
+ params?: MaybeRefOrGetter<ListUsersParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listUsers>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApiUsersGetCollectionQueryOptions(params,options)
+  const queryOptions = getListUsersQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -128,7 +128,7 @@ export function useApiUsersGetCollection<TData = Awaited<ReturnType<typeof apiUs
  * Creates a User resource.
  * @summary Creates a User resource.
  */
-export const apiUsersadminPost = (
+export const createAdmin = (
     userCreateAdminPayload: MaybeRefOrGetter<UserCreateAdminPayload>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -145,11 +145,11 @@ export const apiUsersadminPost = (
 
 
 
-export const getApiUsersadminPostMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersadminPost>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiUsersadminPost>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext> => {
+export const getCreateAdminMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdmin>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof createAdmin>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext> => {
 
-const mutationKey = ['apiUsersadminPost'];
+const mutationKey = ['createAdmin'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -159,10 +159,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiUsersadminPost>>, {data: BodyType<UserCreateAdminPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createAdmin>>, {data: BodyType<UserCreateAdminPayload>}> = (props) => {
           const {data} = props ?? {};
 
-          return  apiUsersadminPost(data,requestOptions)
+          return  createAdmin(data,requestOptions)
         }
 
 
@@ -172,28 +172,28 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiUsersadminPostMutationResult = NonNullable<Awaited<ReturnType<typeof apiUsersadminPost>>>
-    export type ApiUsersadminPostMutationBody = BodyType<UserCreateAdminPayload>
-    export type ApiUsersadminPostMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type CreateAdminMutationResult = NonNullable<Awaited<ReturnType<typeof createAdmin>>>
+    export type CreateAdminMutationBody = BodyType<UserCreateAdminPayload>
+    export type CreateAdminMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
 
     /**
  * @summary Creates a User resource.
  */
-export const useApiUsersadminPost = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersadminPost>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useCreateAdmin = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createAdmin>>, TError,{data: BodyType<UserCreateAdminPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiUsersadminPost>>,
+        Awaited<ReturnType<typeof createAdmin>>,
         TError,
         {data: BodyType<UserCreateAdminPayload>},
         TContext
       > => {
-      return useMutation(getApiUsersadminPostMutationOptions(options), queryClient);
+      return useMutation(getCreateAdminMutationOptions(options), queryClient);
     }
     /**
  * Retrieves a User resource.
  * @summary Retrieves a User resource.
  */
-export const apiUsersmeGet = (
+export const getCurrentUser = (
 
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -208,45 +208,45 @@ export const apiUsersmeGet = (
 
 
 
-export const getApiUsersmeGetQueryKey = () => {
+export const getGetCurrentUserQueryKey = () => {
     return [
     'users','me'
     ] as const;
     }
 
 
-export const getApiUsersmeGetQueryOptions = <TData = Awaited<ReturnType<typeof apiUsersmeGet>>, TError = ErrorJsonld | Error>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiUsersmeGet>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export const getGetCurrentUserQueryOptions = <TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = ErrorJsonld | Error>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  getApiUsersmeGetQueryKey();
+  const queryKey =  getGetCurrentUserQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof apiUsersmeGet>>> = ({ signal }) => apiUsersmeGet(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCurrentUser>>> = ({ signal }) => getCurrentUser(requestOptions, signal);
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof apiUsersmeGet>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>
 }
 
-export type ApiUsersmeGetQueryResult = NonNullable<Awaited<ReturnType<typeof apiUsersmeGet>>>
-export type ApiUsersmeGetQueryError = ErrorJsonld | Error
+export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>
+export type GetCurrentUserQueryError = ErrorJsonld | Error
 
 
 /**
  * @summary Retrieves a User resource.
  */
 
-export function useApiUsersmeGet<TData = Awaited<ReturnType<typeof apiUsersmeGet>>, TError = ErrorJsonld | Error>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof apiUsersmeGet>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
+export function useGetCurrentUser<TData = Awaited<ReturnType<typeof getCurrentUser>>, TError = ErrorJsonld | Error>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
  ): UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getApiUsersmeGetQueryOptions(options)
+  const queryOptions = getGetCurrentUserQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -264,7 +264,7 @@ export function useApiUsersmeGet<TData = Awaited<ReturnType<typeof apiUsersmeGet
  * Removes the User resource.
  * @summary Removes the User resource.
  */
-export const apiUsersIdDelete = (
+export const deleteUser = (
     id: MaybeRefOrGetter<string>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
 ) => {
@@ -279,11 +279,11 @@ export const apiUsersIdDelete = (
 
 
 
-export const getApiUsersIdDeleteMutationOptions = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdDelete>>, TError,{id: string}, TContext> => {
+export const getDeleteUserMutationOptions = <TError = ErrorJsonld | Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: string}, TContext> => {
 
-const mutationKey = ['apiUsersIdDelete'];
+const mutationKey = ['deleteUser'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -293,10 +293,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiUsersIdDelete>>, {id: string}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteUser>>, {id: string}> = (props) => {
           const {id} = props ?? {};
 
-          return  apiUsersIdDelete(id,requestOptions)
+          return  deleteUser(id,requestOptions)
         }
 
 
@@ -306,28 +306,28 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiUsersIdDeleteMutationResult = NonNullable<Awaited<ReturnType<typeof apiUsersIdDelete>>>
+    export type DeleteUserMutationResult = NonNullable<Awaited<ReturnType<typeof deleteUser>>>
 
-    export type ApiUsersIdDeleteMutationError = ErrorJsonld | Error
+    export type DeleteUserMutationError = ErrorJsonld | Error
 
     /**
  * @summary Removes the User resource.
  */
-export const useApiUsersIdDelete = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdDelete>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useDeleteUser = <TError = ErrorJsonld | Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteUser>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiUsersIdDelete>>,
+        Awaited<ReturnType<typeof deleteUser>>,
         TError,
         {id: string},
         TContext
       > => {
-      return useMutation(getApiUsersIdDeleteMutationOptions(options), queryClient);
+      return useMutation(getDeleteUserMutationOptions(options), queryClient);
     }
     /**
  * Updates the User resource.
  * @summary Updates the User resource.
  */
-export const apiUsersIdupdatePasswordPatch = (
+export const changeUserPassword = (
     id: MaybeRefOrGetter<string>,
     userChangePasswordPayloadJsonMergePatch: MaybeRefOrGetter<UserChangePasswordPayloadJsonMergePatch>,
  options?: SecondParameter<typeof CustomHttpClient>,signal?: AbortSignal
@@ -346,11 +346,11 @@ userChangePasswordPayloadJsonMergePatch = toValue(userChangePasswordPayloadJsonM
 
 
 
-export const getApiUsersIdupdatePasswordPatchMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext> => {
+export const getChangeUserPasswordMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeUserPassword>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof changeUserPassword>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext> => {
 
-const mutationKey = ['apiUsersIdupdatePasswordPatch'];
+const mutationKey = ['changeUserPassword'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -360,10 +360,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>, {id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof changeUserPassword>>, {id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}> = (props) => {
           const {id,data} = props ?? {};
 
-          return  apiUsersIdupdatePasswordPatch(id,data,requestOptions)
+          return  changeUserPassword(id,data,requestOptions)
         }
 
 
@@ -373,20 +373,20 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type ApiUsersIdupdatePasswordPatchMutationResult = NonNullable<Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>>
-    export type ApiUsersIdupdatePasswordPatchMutationBody = BodyType<UserChangePasswordPayloadJsonMergePatch>
-    export type ApiUsersIdupdatePasswordPatchMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type ChangeUserPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof changeUserPassword>>>
+    export type ChangeUserPasswordMutationBody = BodyType<UserChangePasswordPayloadJsonMergePatch>
+    export type ChangeUserPasswordMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
 
     /**
  * @summary Updates the User resource.
  */
-export const useApiUsersIdupdatePasswordPatch = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+export const useChangeUserPassword = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof changeUserPassword>>, TError,{id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
-        Awaited<ReturnType<typeof apiUsersIdupdatePasswordPatch>>,
+        Awaited<ReturnType<typeof changeUserPassword>>,
         TError,
         {id: string;data: BodyType<UserChangePasswordPayloadJsonMergePatch>},
         TContext
       > => {
-      return useMutation(getApiUsersIdupdatePasswordPatchMutationOptions(options), queryClient);
+      return useMutation(getChangeUserPasswordMutationOptions(options), queryClient);
     }

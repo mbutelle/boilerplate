@@ -5,14 +5,6 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export * from './apiProductsGetCollection200';
-export * from './apiProductsGetCollectionParams';
-export * from './apiProductsGetCollectionSortCreatedAt';
-export * from './apiProductsGetCollectionSortName';
-export * from './apiProductsGetCollectionSortReference';
-export * from './apiProductsGetCollectionStatus';
-export * from './apiUsersGetCollection200';
-export * from './apiUsersGetCollectionParams';
 export * from './constraintViolation';
 export * from './constraintViolationJsonld';
 export * from './constraintViolationJsonldViolationsItem';
@@ -30,6 +22,14 @@ export * from './hydraCollectionBaseSchemaNoPaginationSearchMappingItem';
 export * from './hydraCollectionBaseSchemaView';
 export * from './hydraItemBaseSchema';
 export * from './hydraItemBaseSchemaContext';
+export * from './listProducts200';
+export * from './listProductsParams';
+export * from './listProductsSortCreatedAt';
+export * from './listProductsSortName';
+export * from './listProductsSortReference';
+export * from './listProductsStatus';
+export * from './listUsers200';
+export * from './listUsersParams';
 export * from './loginCheckPost200';
 export * from './loginCheckPostBody';
 export * from './passwordResetRequestPasswordResetPayload';

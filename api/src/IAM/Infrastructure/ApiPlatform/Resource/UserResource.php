@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\IAM\Application\Command\DeleteUser\DeleteUserCommand;
 use App\IAM\Domain\Model\User;
 use App\IAM\Infrastructure\ApiPlatform\Payload\ChangePasswordPayload;
@@ -27,21 +28,25 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
     operations: [
         new Get(
             uriTemplate: '/users/me',
+            openapi: new OpenApiOperation(operationId: 'getCurrentUser'),
             provider: MeProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/users',
+            openapi: new OpenApiOperation(operationId: 'listUsers'),
             security: "is_granted('ROLE_ADMIN')",
             provider: AdminCollectionProvider::class,
         ),
         new Post(
             uriTemplate: '/users/admin',
+            openapi: new OpenApiOperation(operationId: 'createAdmin'),
             security: "is_granted('ROLE_ADMIN')",
             input: CreateAdminPayload::class,
             processor: ApplyCommandProcessor::class,
         ),
         new Patch(
             uriTemplate: '/users/{id}/update_password',
+            openapi: new OpenApiOperation(operationId: 'changeUserPassword'),
             security: "is_granted('ROLE_ADMIN') or object.id == user.getId().toRfc4122()",
             input: ChangePasswordPayload::class,
             provider: UserItemProvider::class,
@@ -49,6 +54,7 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
         ),
         new Delete(
             uriTemplate: '/users/{id}',
+            openapi: new OpenApiOperation(operationId: 'deleteUser'),
             security: "is_granted('ROLE_ADMIN')",
             provider: UserItemProvider::class,
             processor: ApplyCommandProcessor::class,

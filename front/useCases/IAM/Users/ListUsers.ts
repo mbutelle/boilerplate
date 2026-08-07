@@ -1,3 +1,3 @@
-import { useApiUsersGetCollection } from '@bp/api-client/api/user/user'
+import { useListUsers } from '@bp/api-client/api/user/user'
 
-export default () => useApiUsersGetCollection()
+export default () => useListUsers()

@@ -15,9 +15,11 @@
     "@tanstack/vue-query": "^5",
     "axios": "^1",
     "jwt-decode": "^4",
-    "vue": "^3"
+    "vue": "^3",
+    "zod": "^4"
   },
   "devDependencies": {
-    "orval": "^8.23.0"
+    "orval": "^8.23.0",
+    "prettier": "^3.5.3"
   }
 }

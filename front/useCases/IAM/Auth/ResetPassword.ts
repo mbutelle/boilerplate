@@ -1,7 +1,7 @@
-import { useApiUserspasswordResetRequestsTokenapplyPost } from '@bp/api-client/api/password-reset/password-reset'
+import { useResetPassword } from '@bp/api-client/api/password-reset/password-reset'
 
 export default () => {
-  const mutation = useApiUserspasswordResetRequestsTokenapplyPost()
+  const mutation = useResetPassword()
 
   return {
     ...mutation,

@@ -7,8 +7,9 @@
 
 export interface UserChangePasswordPayloadJsonMergePatch {
   /**
-     * @minLength 8
+     * @minLength 12
      * @nullable
+     * @pattern ^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+)$
      */
   password?: string | null;
 }

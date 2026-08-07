@@ -10,6 +10,6 @@ import type { UserJsonld } from './userJsonld';
 /**
  * User.jsonld collection.
  */
-export type ApiUsersGetCollection200 = HydraCollectionBaseSchema & {
+export type ListUsers200 = HydraCollectionBaseSchema & {
   member: UserJsonld[];
 };

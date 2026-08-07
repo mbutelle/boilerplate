@@ -10,6 +10,6 @@ import type { ProductJsonld } from './productJsonld';
 /**
  * Product.jsonld collection.
  */
-export type ApiProductsGetCollection200 = HydraCollectionBaseSchema & {
+export type ListProducts200 = HydraCollectionBaseSchema & {
   member: ProductJsonld[];
 };

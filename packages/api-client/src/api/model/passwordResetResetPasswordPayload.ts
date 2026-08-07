@@ -5,16 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 
-/**
- * Ressource sans modèle de domaine derrière : les deux opérations ne projettent
- * rien (204), elles ne font que dispatcher une commande. C'est pour cette raison
- * qu'elle n'implémente pas ResourceInterface — il n'y a pas de fromDomain() qui
- * ait un sens ici.
- */
 export interface PasswordResetResetPasswordPayload {
   /**
-     * @minLength 8
+     * @minLength 12
      * @nullable
+     * @pattern ^((?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).+)$
      */
   password: string | null;
 }

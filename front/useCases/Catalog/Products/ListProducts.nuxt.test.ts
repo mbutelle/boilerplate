@@ -5,23 +5,23 @@ import { ref } from 'vue'
 // Le SDK est un import explicite, donc vi.mock — mockNuxtImport ne s'applique
 // qu'aux auto-imports de Nuxt et serait ici silencieusement ignoré.
 // Le module est mocké en entier : Vitest 4 interdit les mocks partiels.
-const useApiProductsGetCollection = vi.fn()
+const useListProducts = vi.fn()
 
 vi.mock('@bp/api-client/api/product/product', () => ({
-  useApiProductsGetCollection: (...args: unknown[]) => useApiProductsGetCollection(...args),
-  getApiProductsGetCollectionQueryKey: () => ['products'],
-  useApiProductsPost: vi.fn(),
-  useApiProductsIdpublishPost: vi.fn(),
-  useApiProductsIdDelete: vi.fn(),
-  useApiProductsIdPatch: vi.fn(),
-  useApiProductsIdGet: vi.fn(),
+  useListProducts: (...args: unknown[]) => useListProducts(...args),
+  getListProductsQueryKey: () => ['products'],
+  useCreateProduct: vi.fn(),
+  usePublishProduct: vi.fn(),
+  useDeleteProduct: vi.fn(),
+  useUpdateProduct: vi.fn(),
+  useGetProduct: vi.fn(),
 }))
 
 const { default: ListProducts } = await import('./ListProducts')
 
 describe('ListProducts', () => {
   it('expose la page et le total renvoyés par l\'API', () => {
-    useApiProductsGetCollection.mockReturnValue({
+    useListProducts.mockReturnValue({
       data: ref({ member: [{ id: '1', name: 'Café' }], totalItems: 42 }),
     })
 
@@ -32,7 +32,7 @@ describe('ListProducts', () => {
   })
 
   it('rend une liste vide tant que la requête n\'a pas répondu', () => {
-    useApiProductsGetCollection.mockReturnValue({ data: ref(undefined) })
+    useListProducts.mockReturnValue({ data: ref(undefined) })
 
     const { products, totalItems } = ListProducts(ref({}))
 
@@ -42,11 +42,22 @@ describe('ListProducts', () => {
   })
 
   it('transmet les paramètres au hook généré, sans les recopier', () => {
-    useApiProductsGetCollection.mockReturnValue({ data: ref(undefined) })
+    useListProducts.mockReturnValue({ data: ref(undefined) })
 
     const params = ref({ page: 2, status: 'draft' as const })
     ListProducts(params)
 
-    expect(useApiProductsGetCollection).toHaveBeenCalledWith(params)
+    expect(useListProducts).toHaveBeenCalledWith(params, expect.anything())
+  })
+
+  it('valide la réponse contre le schéma du contrat', () => {
+    useListProducts.mockReturnValue({ data: ref(undefined) })
+
+    ListProducts(ref({}))
+
+    // La validation passe par `select` : c'est ce qui la limite aux réponses
+    // fraîches au lieu de la rejouer à chaque lecture du cache.
+    const [, options] = useListProducts.mock.calls.at(-1) as [unknown, { query: { select: unknown } }]
+    expect(options.query.select).toBeTypeOf('function')
   })
 })

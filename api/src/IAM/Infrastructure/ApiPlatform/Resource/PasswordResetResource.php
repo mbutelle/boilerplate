@@ -6,21 +6,25 @@ namespace App\IAM\Infrastructure\ApiPlatform\Resource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
 use App\IAM\Infrastructure\ApiPlatform\Payload\RequestPasswordResetPayload;
 use App\IAM\Infrastructure\ApiPlatform\Payload\ResetPasswordPayload;
 use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
 
-/**
- * Ressource sans modèle de domaine derrière : les deux opérations ne projettent
- * rien (204), elles ne font que dispatcher une commande. C'est pour cette raison
- * qu'elle n'implémente pas ResourceInterface — il n'y a pas de fromDomain() qui
- * ait un sens ici.
- */
+// Note interne, volontairement PAS en PHPDoc : API Platform publie le bloc de
+// documentation de la classe comme `description` du schéma OpenAPI, donc dans le
+// contrat que lisent les consommateurs de l'API.
+//
+// Ressource sans modèle de domaine derrière : les deux opérations ne projettent
+// rien (204), elles ne font que dispatcher une commande. C'est pour cette raison
+// qu'elle n'implémente pas ResourceInterface — il n'y a pas de fromDomain() qui
+// ait un sens ici.
 #[ApiResource(
     shortName: 'PasswordReset',
     operations: [
         new Post(
             uriTemplate: '/users/password-reset-requests/send',
+            openapi: new OpenApiOperation(operationId: 'requestPasswordReset'),
             status: 204,
             input: RequestPasswordResetPayload::class,
             output: false,
@@ -28,6 +32,7 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
         ),
         new Post(
             uriTemplate: '/users/password-reset-requests/{token}/apply',
+            openapi: new OpenApiOperation(operationId: 'resetPassword'),
             status: 204,
             input: ResetPasswordPayload::class,
             output: false,

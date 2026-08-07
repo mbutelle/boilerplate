@@ -6,12 +6,6 @@
  */
 import type { HydraItemBaseSchema } from './hydraItemBaseSchema';
 
-/**
- * Contexte d'exemple : c'est la référence à copier pour un nouveau contexte
- * métier. Les cinq écritures passent par ApplyCommandProcessor, les paramètres
- * de collection sont déclarés ici — donc présents dans l'OpenAPI, donc dans le
- * SDK des fronts.
- */
 export type ProductJsonld = HydraItemBaseSchema & ({
   /** @nullable */
   id?: string | null;

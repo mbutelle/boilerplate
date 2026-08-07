@@ -64,8 +64,8 @@ final class OpenApiFactory implements OpenApiFactoryInterface
                         ],
                     ],
                 ])),
-                Response::HTTP_OK
-            )
+            Response::HTTP_OK
+        )
         ;
 
         $openApi

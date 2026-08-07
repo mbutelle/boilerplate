@@ -1,17 +1,17 @@
 import { useQueryClient } from '@tanstack/vue-query'
 import {
-  getApiProductsGetCollectionQueryKey,
-  useApiProductsIdpublishPost,
+  getListProductsQueryKey,
+  usePublishProduct,
 } from '@bp/api-client/api/product/product'
 
 export default () => {
   const queryClient = useQueryClient()
   const toast = useToast()
 
-  const mutation = useApiProductsIdpublishPost({
+  const mutation = usePublishProduct({
     mutation: {
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: getApiProductsGetCollectionQueryKey() })
+        queryClient.invalidateQueries({ queryKey: getListProductsQueryKey() })
       },
       // Le back refuse en 422 la publication d'un produit archivé : la règle est
       // tenue côté serveur, le front se contente de la restituer.
