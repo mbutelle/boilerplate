@@ -11,8 +11,19 @@ use ApiPlatform\OpenApi\Model\PathItem;
 use ApiPlatform\OpenApi\Model\RequestBody;
 use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use ApiPlatform\OpenApi\OpenApi;
+use Symfony\Component\DependencyInjection\Attribute\AsDecorator;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Documente les deux opérations que le bundle de sécurité expose hors API
+ * Platform : /auth et le rafraîchissement de jeton. Sans l'attribut de
+ * décoration ci-dessous la classe n'est jamais appelée, et ces routes
+ * n'existent ni dans l'OpenAPI ni dans le SDK des fronts.
+ */
+// Priorité basse = décorateur le plus externe, donc appliqué en dernier. C'est
+// nécessaire : /auth est ajouté par le décorateur du bundle JWT, et un
+// décorateur appliqué avant lui ne verrait pas encore la route.
+#[AsDecorator('api_platform.openapi.factory', priority: -100)]
 final class OpenApiFactory implements OpenApiFactoryInterface
 {
     private OpenApiFactoryInterface $decorated;
@@ -26,11 +37,12 @@ final class OpenApiFactory implements OpenApiFactoryInterface
     {
         $openApi = $this->decorated->__invoke($context);
 
-        $openApi
-            ->getPaths()
-            ->getPath('/auth')
-            ->getPost()
-            ->addResponse((new OpenApiResponse())
+        $authPath = $openApi->getPaths()->getPath('/auth');
+        $authPost = $authPath?->getPost();
+
+        // Sans garde, un socle dont le pare-feu n'expose pas /auth ferait échouer
+        // l'export entier de l'OpenAPI.
+        $authPost?->addResponse((new OpenApiResponse())
                 ->withDescription('Login')
                 ->withContent(new \ArrayObject([
                     'application/json' => [

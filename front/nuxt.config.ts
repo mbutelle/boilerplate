@@ -12,7 +12,6 @@ export default defineNuxtConfig({
   css: [
     '@fortawesome/fontawesome-free/css/all.css',
     'primeicons/primeicons.css',
-    'flag-icons/css/flag-icons.min.css',
     '~/assets/css/styles.scss',
   ],
   runtimeConfig: {
@@ -20,7 +19,7 @@ export default defineNuxtConfig({
       API_URL: process.env.API_URL,
     },
   },
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2025-08-01',
   eslint: {
     config: {
       stylistic: true,

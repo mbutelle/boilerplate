@@ -13,13 +13,9 @@ const model = ref([
     }],
   },
   {
-    label: 'Configuration',
+    label: 'Catalogue',
     items: [
-      { label: 'Locales', icon: 'pi pi-fw pi-globe', to: '/core-configuration/locales' },
-      { label: 'FAQ', icon: 'pi pi-fw pi-question-circle', to: '/core-configuration/faq' },
-      { label: 'Contenus statiques', icon: 'pi pi-fw pi-file', to: '/core-configuration/static-contents' },
-      { label: 'Utilisateurs', icon: 'pi pi-fw pi-users', to: '/core-configuration/admin' },
-      { label: 'Configurations', icon: 'pi pi-fw pi-cog', to: '/core-configuration/misc-configurations' },
+      { label: 'Produits', icon: 'pi pi-fw pi-box', to: '/catalog/products' },
     ],
   },
 ])

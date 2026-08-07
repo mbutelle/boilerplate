@@ -1,0 +1,23 @@
+{
+  "name": "@bp/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./api/model": "./src/api/model/index.ts",
+    "./api/*": "./src/api/*.ts"
+  },
+  "scripts": {
+    "orval": "orval --config ./orval.config.cjs"
+  },
+  "peerDependencies": {
+    "@tanstack/vue-query": "^5",
+    "axios": "^1",
+    "jwt-decode": "^4",
+    "vue": "^3"
+  },
+  "devDependencies": {
+    "orval": "^8.23.0"
+  }
+}

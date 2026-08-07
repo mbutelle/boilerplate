@@ -4,7 +4,6 @@ import AppConfigurator from './AppConfigurator.vue'
 import { logOutUser } from '~/composables/UseAuth'
 
 const { toggleMenu, toggleDarkMode, isDarkTheme } = UseLayout()
-const { currentLocale, setLocale, getAvailableLocales } = UseLocale()
 </script>
 
 <template>
@@ -43,34 +42,6 @@ const { currentLocale, setLocale, getAvailableLocales } = UseLocale()
     </div>
 
     <div class="layout-topbar-actions">
-      <div class="locale-selector">
-        <Select
-          v-model="currentLocale" :options="getAvailableLocales" option-value="code"
-          placeholder="Select Locale"
-          class="w-full md:w-14rem" @change="setLocale(currentLocale)"
-        >
-          <template #value="slotProps">
-            <div v-if="slotProps.value" class="flex items-center">
-              <span
-                :class="'mr-2 fi fi-' + slotProps.value.toLowerCase().slice(-2)"
-                style="width: 18px; height: 12px"
-              />
-            </div>
-            <div v-else class="p-1">
-              Select Locale
-            </div>
-          </template>
-          <template #option="slotProps">
-            <div class="flex items-center">
-              <span
-                :class="'mr-2 fi fi-' + slotProps.option.code.toLowerCase().slice(-2)"
-                style="width: 18px; height: 12px"
-              />
-              <div>{{ slotProps.option.name }}</div>
-            </div>
-          </template>
-        </Select>
-      </div>
       <div class="layout-config-menu">
         <button type="button" class="layout-topbar-action" @click="toggleDarkMode">
           <i :class="['pi', { 'pi-moon': isDarkTheme, 'pi-sun': !isDarkTheme }]" />

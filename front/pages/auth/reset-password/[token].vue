@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useVuelidate } from '@vuelidate/core'
 import { helpers, required, sameAs, minLength } from '@vuelidate/validators'
-import { apiUserspasswordResetRequestsTokenapplyPatch } from '~/services/client'
+import ResetPassword from '~/useCases/IAM/Auth/ResetPassword'
 import FloatingConfigurator from '~/components/FloatingConfigurator.vue'
 import { useRoute } from '#vue-router'
 import { computed } from 'vue'
@@ -15,6 +15,7 @@ definePageMeta({
 
 const route = useRoute()
 const token = computed(() => route.params.token as string)
+const { resetPassword } = ResetPassword()
 
 if (!token.value) {
   navigateTo('/')
@@ -35,7 +36,7 @@ const rules = computed(() => ({
     uppercase: helpers.withMessage('Au moins une majuscule', helpers.regex(/[A-Z]/)),
     lowercase: helpers.withMessage('Au moins une minuscule', helpers.regex(/[a-z]/)),
     numeric: helpers.withMessage('Au moins un chiffre', helpers.regex(/\d+/)),
-    special: helpers.withMessage('Au moins un caractère spécial', helpers.regex(/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/)),
+    special: helpers.withMessage('Au moins un caractère spécial', helpers.regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/)),
     min: helpers.withMessage('Le mot de passe doit comporter au moins 12 caractères', minLength(12)),
 
   },
@@ -54,7 +55,7 @@ const handle = async () => {
 
   try {
     isLoading.value = true
-    await apiUserspasswordResetRequestsTokenapplyPatch(token.value, resetPasswordRequest)
+    await resetPassword(token.value, resetPasswordRequest.password ?? '')
     toast.add({
       severity: 'success',
       summary: 'Votre mot de passe a été modifié.',
@@ -64,7 +65,7 @@ const handle = async () => {
     isLoading.value = false
     navigateTo('/')
   }
-  catch (e) {
+  catch {
     toast.add({
       severity: 'error',
       summary: 'Une erreur est survenue.',

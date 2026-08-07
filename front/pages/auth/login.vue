@@ -1,11 +1,11 @@
 <script setup>
 import { ref } from 'vue'
 import FloatingConfigurator from '@/components/FloatingConfigurator.vue'
-import Login from '~/useCases/Security/Auth/Login.js'
+import Login from '~/useCases/IAM/Auth/Login'
 
 const email = ref('')
 const password = ref('')
-const { mutate: login } = Login()
+const { login } = Login()
 
 const onSubmit = () => {
   login({

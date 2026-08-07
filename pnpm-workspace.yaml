@@ -1,0 +1,12 @@
+packages:
+  - 'front'
+  - 'packages/*'
+
+# pnpm 10+ bloque par défaut les scripts de build des dépendances. Sans cette
+# liste, esbuild n'a pas de binaire, le watcher de Nuxt ne se compile pas, et le
+# front démarre sur des erreurs difficiles à rattacher à leur cause.
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - esbuild
+  - unrs-resolver
+  - vue-demi

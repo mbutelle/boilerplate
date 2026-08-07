@@ -2,10 +2,8 @@
 import { useToast } from 'primevue/usetoast'
 import { useVuelidate } from '@vuelidate/core'
 import { helpers, required } from '@vuelidate/validators'
-import {
-  type PasswordResetRequestJsonldPasswordResetRequestsWrite,
-  apiUserspasswordResetRequestssendPost,
-} from '~/services/client'
+import type { PasswordResetRequestPasswordResetPayload } from '@bp/api-client/api/model'
+import RequestPasswordReset from '~/useCases/IAM/Auth/RequestPasswordReset'
 import FloatingConfigurator from '~/components/FloatingConfigurator.vue'
 
 definePageMeta({
@@ -15,7 +13,9 @@ definePageMeta({
 
 const toast = useToast()
 
-const request = reactive<PasswordResetRequestJsonldPasswordResetRequestsWrite>({
+const { requestReset } = RequestPasswordReset()
+
+const request = reactive<PasswordResetRequestPasswordResetPayload>({
   email: '',
 })
 
@@ -35,7 +35,7 @@ const handle = async () => {
 
   try {
     isLoading.value = true
-    await apiUserspasswordResetRequestssendPost(request)
+    await requestReset(request.email ?? '')
 
     toast.add({
       severity: 'success',
@@ -46,7 +46,7 @@ const handle = async () => {
     isLoading.value = false
     navigateTo('/')
   }
-  catch (e) {
+  catch {
     toast.add({
       severity: 'error',
       summary: 'Une erreur est survenue.',
