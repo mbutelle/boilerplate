@@ -1,0 +1,29 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\IAM\Infrastructure\ApiPlatform\Payload;
+
+use App\IAM\Application\Command\CreateUser\CreateUserCommand;
+use App\Shared\Application\Command\CommandInterface;
+use App\Shared\Infrastructure\ApiPlatform\Resource\Payload\CommandableInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+final class CreateAdminPayload implements CommandableInterface
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Email]
+        public ?string $email = null,
+    ) {
+    }
+
+    /**
+     * @param array<string, mixed> $uriVariables
+     * @param array<string, mixed> $context
+     */
+    public function toCommand(array $uriVariables, array $context): CommandInterface
+    {
+        return new CreateUserCommand((string) $this->email, null, true);
+    }
+}

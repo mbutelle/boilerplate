@@ -12,7 +12,7 @@ security:
 
         app_user_provider:
             entity:
-                class: App\Security\Entity\User
+                class: App\IAM\Domain\Model\User
                 property: email
 
     firewalls:

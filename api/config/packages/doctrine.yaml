@@ -15,7 +15,11 @@ doctrine:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
         report_fields_where_declared: true
-        validate_xml_mapping: true
+        # Désactivé à cause de <gedmo:timestampable> : le XSD des doctrine-extensions
+        # n'est pas résolvable hors ligne et le wildcard strict du schéma Doctrine
+        # rejette l'élément. Le compromis est de perdre la validation des mappings ;
+        # doctrine:schema:validate reste le filet.
+        validate_xml_mapping: false
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
@@ -24,11 +28,18 @@ doctrine:
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/mapping/Shared'
                 prefix: App\Shared\Domain
-            Security:
+            IAM:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/mapping/IAM'
+                prefix: App\IAM\Domain
+            # L'entité RefreshToken vient du bundle gesdinet et garde son mapping
+            # par attributs : ce n'est pas un modèle de domaine.
+            IAMInfrastructure:
                 is_bundle: false
                 type: attribute
-                dir: '%kernel.project_dir%/src/Security/Entity'
-                prefix: App\Security\Entity
+                dir: '%kernel.project_dir%/src/IAM/Infrastructure/Security'
+                prefix: App\IAM\Infrastructure\Security
 
 when@test:
     doctrine:

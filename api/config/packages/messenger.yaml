@@ -5,6 +5,12 @@ framework:
             command.bus:
                 middleware:
                     - App\Shared\Infrastructure\Symfony\Messenger\Middleware\LockableCommandMiddleware
+                    # Placé AVANT doctrine_transaction, donc plus à l'extérieur : les
+                    # événements publiés depuis un handler de commande sont mis de côté
+                    # et ne partent qu'une fois la transaction commitée. Sans lui, un
+                    # abonné qui envoie un e-mail l'envoie pendant la transaction — et
+                    # le mail est parti même si le commit échoue derrière.
+                    - dispatch_after_current_bus
                     - doctrine_ping_connection
                     - doctrine_close_connection
                     - doctrine_transaction
@@ -15,6 +21,7 @@ framework:
             event.bus:
                 default_middleware: allow_no_handlers
                 middleware:
+                    - dispatch_after_current_bus
                     - validation
             message.bus:
                 default_middleware: allow_no_handlers

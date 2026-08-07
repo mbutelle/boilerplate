@@ -13,12 +13,12 @@ api_platform:
                 type: header
     mapping:
         paths:
-            - '%kernel.project_dir%/src/Security/Entity'
-            - '%kernel.project_dir%/src/Security/ApiResource'
+            - '%kernel.project_dir%/src/IAM/Infrastructure/ApiPlatform/Resource'
 
 parameters:
     # Associe le FQCN d'un modèle de domaine au FQCN de sa ressource API Platform,
     # consommé par ApplyCommandProcessor. Vide tant qu'aucune ressource ne passe par
     # le bus de commande — mais garder une map vide, pas null : ApplyCommandProcessor
     # attend un array et le container ne compile pas sans ça.
-    domain_resource_mapping: {}
+    domain_resource_mapping:
+        App\IAM\Domain\Model\User: App\IAM\Infrastructure\ApiPlatform\Resource\UserResource
