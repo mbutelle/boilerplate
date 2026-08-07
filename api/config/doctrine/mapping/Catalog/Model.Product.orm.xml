@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:gedmo="http://gediminasm.org/schemas/orm/doctrine-extensions-mapping"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd
+                          http://gediminasm.org/schemas/orm/doctrine-extensions-mapping
+                          https://gediminasm.org/schemas/orm/doctrine-extensions-mapping.xsd"
+>
+    <entity name="App\Catalog\Domain\Model\Product" table="product" repository-class="App\Catalog\Infrastructure\Doctrine\Repository\ProductRepository">
+        <id name="id" type="domain_id">
+            <generator strategy="NONE"/>
+        </id>
+
+        <field name="reference" length="64" unique="true"/>
+        <field name="name" length="255"/>
+        <field name="description" type="text" nullable="true"/>
+        <field name="status" length="20" enum-type="App\Catalog\Domain\ValueObject\ProductStatus"/>
+
+        <embedded name="price" class="App\Catalog\Domain\ValueObject\Price" use-column-prefix="true"/>
+
+        <field name="createdAt" column="created_at" type="datetime"/>
+        <field name="updatedAt" column="updated_at" type="datetime" nullable="true">
+            <gedmo:timestampable on="update"/>
+        </field>
+    </entity>
+</doctrine-mapping>

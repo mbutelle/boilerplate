@@ -8,6 +8,9 @@ use App\Shared\Application\Query\QueryInterface;
 
 trait ApplyOrderToQueryTrait
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function applyOrder(QueryInterface $query, array $context): void
     {
         if (!method_exists($query, 'order') || !isset($context['filters'])) {

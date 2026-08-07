@@ -90,6 +90,12 @@ final class UserResource implements ResourceInterface
         );
     }
 
+    /**
+     * Masqué explicitement : sans cela le sérialiseur voit un getter et publie
+     * une propriété "deleteCommand" dans le schéma, donc dans le SDK des fronts.
+     * Le piège vaut pour toute ressource implémentant ResourceInterface.
+     */
+    #[ApiProperty(readable: false, writable: false)]
     public function getDeleteCommand(): ?CommandInterface
     {
         return new DeleteUserCommand((string) $this->id);

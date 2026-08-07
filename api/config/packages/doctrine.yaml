@@ -33,6 +33,11 @@ doctrine:
                 type: xml
                 dir: '%kernel.project_dir%/config/doctrine/mapping/IAM'
                 prefix: App\IAM\Domain
+            Catalog:
+                is_bundle: false
+                type: xml
+                dir: '%kernel.project_dir%/config/doctrine/mapping/Catalog'
+                prefix: App\Catalog\Domain
             # L'entité RefreshToken vient du bundle gesdinet et garde son mapping
             # par attributs : ce n'est pas un modèle de domaine.
             IAMInfrastructure:

@@ -8,6 +8,9 @@ use App\Shared\Application\Query\QueryInterface;
 
 trait ApplyPageToQueryTrait
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public function applyPage(QueryInterface $query, array $context): void
     {
         if (!method_exists($query, 'paginate') || !isset($context['filters'])) {
