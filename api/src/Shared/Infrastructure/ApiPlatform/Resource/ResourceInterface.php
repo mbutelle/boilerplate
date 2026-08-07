@@ -8,6 +8,9 @@ use App\Shared\Application\Command\CommandInterface;
 
 interface ResourceInterface
 {
+    /**
+     * @param array<string, mixed> $context
+     */
     public static function fromDomain(object $domain, array $context = []): self;
 
     public function getDeleteCommand(): ?CommandInterface;

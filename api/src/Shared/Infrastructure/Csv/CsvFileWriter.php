@@ -6,56 +6,51 @@ namespace App\Shared\Infrastructure\Csv;
 
 class CsvFileWriter
 {
-    /**
-     * @var string
-     */
-    private $file;
+    private string $file;
 
     /**
-     * @var bool|resource|null
+     * @var resource|null
      */
     private $fileDescriptor;
 
-    /**
-     * @var string
-     */
-    private $delimiter;
+    private string $delimiter;
 
     /**
-     * @var array
+     * @var list<string>
      */
-    private $headers;
+    private array $headers;
 
     /**
-     * @param string|null $file
-     * @param string      $delimiter
+     * @param list<string> $headers
      */
-    public function __construct($file = null, array $headers = [], $delimiter = ';')
+    public function __construct(?string $file = null, array $headers = [], string $delimiter = ';')
     {
-        if (!$file) {
-            $file = 'php://stdout';
-        }
-
         $this->delimiter = $delimiter;
-        $this->file = $file;
+        $this->file = $file ?? 'php://stdout';
         $this->headers = $headers;
 
         $this->fileDescriptor = $this->createFileDescriptor($this->file);
 
         if ($this->headers) {
-            fputcsv($this->fileDescriptor, $this->headers, $this->delimiter);
+            fputcsv($this->fileDescriptor, $this->headers, $this->delimiter, '"', '\\');
         }
     }
 
     /**
+     * @param array<string, scalar|null> $line
+     *
      * @throws \InvalidArgumentException
      */
     public function write(array $line): void
     {
+        if (null === $this->fileDescriptor) {
+            throw new \LogicException('Cannot write, the writer is closed.');
+        }
+
         $this->checkLine($line);
         $this->checkLineWithHeader($line);
 
-        fputcsv($this->fileDescriptor, $line, $this->delimiter);
+        fputcsv($this->fileDescriptor, $line, $this->delimiter, '"', '\\');
     }
 
     /**
@@ -74,7 +69,7 @@ class CsvFileWriter
     /**
      * @return resource
      */
-    private function createFileDescriptor($file)
+    private function createFileDescriptor(string $file)
     {
         if (!is_dir(\dirname($file))) {
             mkdir(\dirname($file), 0775, true);
@@ -88,15 +83,21 @@ class CsvFileWriter
         return $fp;
     }
 
+    /**
+     * @param array<string, mixed> $line
+     */
     private function checkLine(array $line): void
     {
         foreach ($line as $value) {
             if (\is_array($value) || \is_object($value)) {
-                throw new \InvalidArgumentException(sprintf('Expected a scalar, got a "%s".', \is_object($value) ? \get_class($value) : strtolower(\gettype($value))));
+                throw new \InvalidArgumentException(sprintf('Expected a scalar, got a "%s".', \is_object($value) ? $value::class : strtolower(\gettype($value))));
             }
         }
     }
 
+    /**
+     * @param array<string, mixed> $line
+     */
     private function checkLineWithHeader(array $line): void
     {
         if (!$this->headers) {

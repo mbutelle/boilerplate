@@ -8,7 +8,7 @@ export const refreshToken = async (): Promise<boolean> => {
     return false
   }
 
-  const data = await gesdinetJwtRefreshToken({ data: { refresh_token: refresh.value } })
+  const data = await gesdinetJwtRefreshToken({ refresh_token: refresh.value })
 
   token.value = data.token
   refresh.value = data.refresh_token

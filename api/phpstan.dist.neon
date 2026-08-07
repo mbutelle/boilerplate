@@ -5,4 +5,6 @@ parameters:
         - config/
         - public/
         - src/
-        - tests/
+    # tests/ est volontairement exclu : PHPStan ne comprend pas le binding
+    # runtime de Pest ($this dans une closure, self::getContainer() hors classe)
+    # et produit des milliers de faux positifs, même à bas niveau.

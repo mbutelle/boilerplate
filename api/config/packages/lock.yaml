@@ -1,0 +1,6 @@
+framework:
+    # Le magasin vient de LOCK_DSN, il n'est plus codé en dur. L'ancien
+    # middleware instanciait un DoctrineDbalPostgreSqlStore alors que la base est
+    # MySQL : le verrou n'aurait pas pu fonctionner, à supposer même que
+    # symfony/lock ait été installé — il ne l'était pas.
+    lock: '%env(LOCK_DSN)%'

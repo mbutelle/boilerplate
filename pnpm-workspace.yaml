@@ -8,5 +8,9 @@ packages:
 onlyBuiltDependencies:
   - '@parcel/watcher'
   - esbuild
+  # rolldown est arrivé avec Nuxt 4.5 : sans son binaire natif, `nuxt typecheck`
+  # échoue sur « Cannot find module '../rolldown-binding…node' », alors que
+  # `nuxt build` passe. Le symptôme ne se voit donc qu'à la gate de types.
+  - rolldown
   - unrs-resolver
   - vue-demi

@@ -16,7 +16,9 @@ const layoutState = reactive({
   configSidebarVisible: false,
   staticMenuMobileActive: false,
   menuHoverActive: false,
-  activeMenuItem: null,
+  // Typé explicitement : sans annotation, reactive() infère `null` et
+  // toute affectation d'une chaîne devient une erreur de type.
+  activeMenuItem: null as string | null,
 })
 
 export function UseLayout() {

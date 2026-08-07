@@ -4,13 +4,25 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Csv;
 
+/**
+ * @implements \Iterator<int, array<string, string>|false>
+ */
 class CsvFileIterator implements \Iterator
 {
     private string $file;
+
+    /** @var list<string> */
     private array $headers;
+
+    /** @var resource|false */
     private mixed $fileDescriptor;
+
+    /** @var list<string>|null */
     private ?array $currentElement = null;
+
     private string $delimiter;
+
+    /** @var array<int, list<string>> */
     private array $linesWithError = [];
     private int $lineCounter = 1;
 
@@ -23,6 +35,9 @@ class CsvFileIterator implements \Iterator
         $this->next();
     }
 
+    /**
+     * @return array<int, list<string>>
+     */
     public function getLinesWithError(): array
     {
         return $this->linesWithError;
@@ -35,6 +50,9 @@ class CsvFileIterator implements \Iterator
         return $matches[1] ?? '';
     }
 
+    /**
+     * @return array<string, string>|false
+     */
     public function current(): mixed
     {
         if (is_array($this->currentElement)) {
@@ -96,6 +114,9 @@ class CsvFileIterator implements \Iterator
         $this->next();
     }
 
+    /**
+     * @return list<string>
+     */
     public function getHeaders(): array
     {
         return $this->headers;
@@ -138,26 +159,41 @@ class CsvFileIterator implements \Iterator
         return is_resource($this->fileDescriptor) && !feof($this->fileDescriptor);
     }
 
+    /**
+     * @param list<string> $line
+     */
     private function isInvalidLine(array $line): bool
     {
         return $this->isNullArray($line) || $this->hasColumnCountMismatch($line);
     }
 
+    /**
+     * @param list<string> $line
+     */
     private function hasColumnCountMismatch(array $line): bool
     {
         return count($line) !== count($this->headers);
     }
 
+    /**
+     * @param list<string> $line
+     */
     private function recordErrorLine(array $line): void
     {
         $this->linesWithError[$this->lineCounter] = $line;
     }
 
+    /**
+     * @param array<int, string|null> $data
+     */
     private function isNullArray(array $data): bool
     {
         return 1 === count($data) && !isset($data[0]);
     }
 
+    /**
+     * @return resource|false
+     */
     private function openFile()
     {
         return @fopen($this->file, 'r');

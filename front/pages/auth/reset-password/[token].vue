@@ -25,12 +25,17 @@ if (!token.value) {
   navigateTo('/')
 }
 
-interface resetPasswordRequest {
-  password?: string | undefined
-  password_confirmation?: string | undefined
+interface ResetPasswordRequest {
+  password: string
+  password_confirmation: string
 }
 
-const resetPasswordRequest = reactive<resetPasswordRequest>({})
+// Champs initialisés plutôt qu'optionnels : useVuelidate attend un état dont
+// chaque champ existe, et des propriétés optionnelles ne satisfont pas son type.
+const resetPasswordRequest = reactive<ResetPasswordRequest>({
+  password: '',
+  password_confirmation: '',
+})
 
 const isLoading = ref<boolean>(false)
 
@@ -63,7 +68,7 @@ const handle = async () => {
 
   try {
     isLoading.value = true
-    await resetPassword(token.value, resetPasswordRequest.password ?? '')
+    await resetPassword(token.value, resetPasswordRequest.password)
     toast.add({
       severity: 'success',
       summary: 'Votre mot de passe a été modifié.',
@@ -144,7 +149,7 @@ const handle = async () => {
                 />
                 <div v-if="v$.password.$error">
                   <Message
-                    v-for="error in v$.password.$errors" :key="error" severity="error"
+                    v-for="error in v$.password.$errors" :key="error.$uid" severity="error"
                     class="mt-2 text-left"
                   >
                     {{ error.$message }}
