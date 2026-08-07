@@ -10,6 +10,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 final class UploadedFileDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @param array<string,mixed> $context
+     */
     public function denormalize($data, string $type, ?string $format = null, array $context = []): File
     {
         if (!$data instanceof File) {
@@ -20,7 +23,7 @@ final class UploadedFileDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param array<int,mixed> $context
+     * @param array<string,mixed> $context
      */
     public function supportsDenormalization($data, $type, $format = null, array $context = []): bool
     {
@@ -28,7 +31,7 @@ final class UploadedFileDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @return array<string,bool>]
+     * @return array<string,bool>
      */
     public function getSupportedTypes(?string $format): array
     {

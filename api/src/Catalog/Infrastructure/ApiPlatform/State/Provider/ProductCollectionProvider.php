@@ -17,7 +17,10 @@ use App\Shared\Infrastructure\ApiPlatform\State\Provider\Traits\ApplyOrderToQuer
 use App\Shared\Infrastructure\ApiPlatform\State\Provider\Traits\ApplyPageToQueryTrait;
 
 /**
- * @implements ProviderInterface<ProductResource>
+ * Le paramètre générique est `object` et non ProductResource : l'opération rend
+ * un paginateur, pas une ressource isolée.
+ *
+ * @implements ProviderInterface<object>
  */
 final class ProductCollectionProvider implements ProviderInterface
 {

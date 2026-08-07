@@ -96,7 +96,7 @@ final class UserResource implements ResourceInterface
      * Le piège vaut pour toute ressource implémentant ResourceInterface.
      */
     #[ApiProperty(readable: false, writable: false)]
-    public function getDeleteCommand(): ?CommandInterface
+    public function getDeleteCommand(): CommandInterface
     {
         return new DeleteUserCommand((string) $this->id);
     }

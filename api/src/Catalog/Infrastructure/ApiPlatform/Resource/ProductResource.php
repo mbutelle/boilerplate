@@ -141,7 +141,7 @@ final class ProductResource implements ResourceInterface
      * Le piège vaut pour toute ressource implémentant ResourceInterface.
      */
     #[ApiProperty(readable: false, writable: false)]
-    public function getDeleteCommand(): ?CommandInterface
+    public function getDeleteCommand(): CommandInterface
     {
         return new DeleteProductCommand((string) $this->id);
     }
