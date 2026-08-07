@@ -1,0 +1,18 @@
+{
+	auto_https off
+	frankenphp {
+		worker {
+			file /var/www/app/public/index.php
+			# `watch` recharge le worker quand un fichier PHP change. Sans lui, un
+			# nouveau fichier n'est pas vu tant que le conteneur n'est pas relancé
+			# — le piège classique du worker mode en développement.
+			watch
+		}
+	}
+}
+
+:80 {
+	root /var/www/app/public
+	encode zstd br gzip
+	php_server
+}

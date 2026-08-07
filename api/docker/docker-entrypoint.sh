@@ -1,13 +1,11 @@
 #!/bin/sh
 set -e
 
-# first arg is `-f` or `--some-option`
-if [ "${1#-}" != "$1" ]; then
-	set -- php-fpm "$@"
-fi
-
 composer install --apcu-autoloader -a --no-scripts
 
-bin/console d:m:m --no-interaction --allow-no-migration
+# Paire de clés JWT au premier démarrage ; sans effet une fois qu'elle existe.
+bin/console lexik:jwt:generate-keypair --skip-if-exists --no-interaction
+
+bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
 exec docker-php-entrypoint "$@"

@@ -2,38 +2,30 @@
 DOCKER         = docker
 DOCKER_COMPOSE = docker compose
 
-FRONT = client
-PHP = php
-
-# code analysis config
-PHPSTAN_LEVEL = 1
-
-# build config
-BUILD_PHP_CONTAINER_NAME=boilerplater_build_php
-BUILD_PHP_PACKAGE_NAME=archive-php.tar.gz
-
-BUILD_FRONT_CONTAINER_NAME=boilerplater_build_front
-BUILD_FRONT_PACKAGE_NAME_STAGING=archive-admin-staging.tar.gz
-BUILD_FRONT_PACKAGE_NAME_PRODUCTION=archive-admin-production.tar.gz
+# Le service PHP s'appelle désormais `api` : c'est la même image FrankenPHP qui
+# sert le HTTP et exécute les commandes console, il n'y a plus de conteneur
+# nginx séparé.
+API   = api
+FRONT = front
 
 ##
-## Common Commands
+## Commandes courantes
 ## -------
 ##
 
-start: ## Start the project
-	$(DOCKER_COMPOSE) up -d --remove-orphans --force-recreate
+start: env ## démarrer le projet
+	$(DOCKER_COMPOSE) up -d --remove-orphans
 .PHONY: start
 
-stop: ## Stop the project
+stop: ## arrêter le projet
 	$(DOCKER_COMPOSE) stop
 .PHONY: stop
 
-ps: ## list all containers
+ps: ## lister les conteneurs
 	$(DOCKER_COMPOSE) ps
 .PHONY: ps
 
-logs: ## watch container's logs
+logs: ## suivre les journaux
 	$(DOCKER_COMPOSE) logs -f
 .PHONY: logs
 
@@ -42,149 +34,136 @@ help:
 .PHONY: help
 
 ##
-## Container's connection commands
+## Droits et environnement
 ## -------
 ##
 
-front-shell: ## open shell in front container
+env: ## écrire les UID/GID hôte dans .env pour que les conteneurs tournent sous votre identité
+	@grep -q '^UID=' .env 2>/dev/null || echo "UID=$$(id -u)" >> .env
+	@grep -q '^GID=' .env 2>/dev/null || echo "GID=$$(id -g)" >> .env
+	@echo "UID/GID écrits dans .env : $$(id -u):$$(id -g)"
+.PHONY: env
+
+fix-perms: ## reprendre la propriété des fichiers laissés en root par un conteneur (filet de sécurité)
+	# -h : modifier le lien lui-même, jamais sa cible (dist/ peut pointer dans le vide).
+	sudo find . -path ./mysql_storage -prune -o -path ./.git -prune -o \
+		\( ! -user $$(id -u) -o ! -group $$(id -g) \) -exec chown -h $$(id -u):$$(id -g) {} +
+	@echo "Droits rendus à $$(id -u):$$(id -g) (mysql_storage et .git exclus)"
+.PHONY: fix-perms
+
+##
+## Accès aux conteneurs
+## -------
+##
+
+front-shell: ## ouvrir un shell dans le conteneur front
 	$(DOCKER_COMPOSE) exec $(FRONT) sh
 .PHONY: front-shell
 
-php-shell: ## open shell in php container
-	$(DOCKER_COMPOSE) exec $(PHP) bash
-.PHONY: php-shell
+api-shell: ## ouvrir un shell dans le conteneur api
+	$(DOCKER_COMPOSE) exec $(API) sh
+.PHONY: api-shell
 
 ##
-## Utility command
+## Utilitaires
 ## -------
 ##
 
-fixture-load: ## load alice fixture
-	$(DOCKER_COMPOSE) exec $(PHP) bin/console doctrine:fixtures:load
+fixture-load: ## charger les fixtures
+	$(DOCKER_COMPOSE) exec $(API) bin/console doctrine:fixtures:load --no-interaction
 .PHONY: fixture-load
 
+migrate: ## jouer les migrations
+	$(DOCKER_COMPOSE) exec $(API) bin/console doctrine:migrations:migrate --no-interaction
+.PHONY: migrate
+
 ##
-## Tests command
+## Tests
 ## -------
 ##
 
-test: php-test ## launch all tests
+test: php-test front-test ## lancer tous les tests
 .PHONY: test
 
-php-test-parallel: ## launch pest tests with parallel
-	$(DOCKER_COMPOSE) exec $(PHP) ./vendor/bin/pest --parallel
-.PHONY: php-test-parallel
-
-php-test-coverage: ## launch pest tests with coverage
-	$(DOCKER_COMPOSE) exec $(PHP) /bin/bash -c "export XDEBUG_MODE=coverage && ./vendor/bin/pest --coverage"
-.PHONY: php-test-coverage
-
-php-test: ## launch pest tests
-	$(DOCKER_COMPOSE) exec $(PHP) ./vendor/bin/pest
+php-test: ## lancer les tests Pest
+	$(DOCKER_COMPOSE) exec $(API) ./vendor/bin/pest
 .PHONY: php-test
 
+php-test-parallel: ## lancer les tests Pest en parallèle
+	$(DOCKER_COMPOSE) exec $(API) ./vendor/bin/pest --parallel
+.PHONY: php-test-parallel
+
+php-test-coverage: ## lancer les tests Pest avec couverture
+	$(DOCKER_COMPOSE) exec $(API) /bin/sh -c "export XDEBUG_MODE=coverage && ./vendor/bin/pest --coverage"
+.PHONY: php-test-coverage
+
+front-test: ## lancer les tests du front
+	$(DOCKER_COMPOSE) exec $(FRONT) pnpm test
+.PHONY: front-test
+
 ##
-## Technical command
+## Technique
 ## -------
 ##
 
-generate-front-services: ## use orval to generate http client
-	$(DOCKER_COMPOSE) exec $(PHP) bin/console api:openapi:export -o /var/shared/openai_schema.json
-	$(DOCKER_COMPOSE) exec $(FRONT) yarn orval --config ./orval.config.cjs
-.PHONY: generate-front-services
+sdk: ## exporter l'OpenAPI puis régénérer le SDK partagé
+	$(DOCKER_COMPOSE) exec $(API) bin/console api:openapi:export -o /var/shared/openapi_schema.json
+	$(DOCKER_COMPOSE) exec $(FRONT) pnpm --filter @bp/api-client orval
+.PHONY: sdk
 
 ##
-## Code analysis
+## Analyse de code
 ## -------
 ##
 
-phpstan: ## launch phpstan on backend
-	$(DOCKER_COMPOSE) exec $(PHP) php -dmemory_limit=-1 vendor/bin/phpstan --level=${PHPSTAN_LEVEL} analyse src/
+phpstan: ## lancer PHPStan (le niveau vient de phpstan.dist.neon, pas d'un drapeau)
+	$(DOCKER_COMPOSE) exec $(API) php -dmemory_limit=-1 vendor/bin/phpstan analyse
 .PHONY: phpstan
 
+typecheck: ## vérifier les types du front
+	$(DOCKER_COMPOSE) exec $(FRONT) pnpm typecheck
+.PHONY: typecheck
+
 ##
-## Linter
+## Linters
 ## -------
 ##
 
-linter: php-linter admin-linter ## Global linter
+linter: php-linter front-linter ## tous les linters
 .PHONY: linter
 
-linter-fix: php-linter-fix admin-linter-fix ## Global linter fix
+linter-fix: php-linter-fix front-linter-fix ## corriger avec tous les linters
 .PHONY: linter-fix
 
-
-php-linter: ## php cs fixer
-	$(DOCKER_COMPOSE) exec $(PHP) vendor/bin/php-cs-fixer check
+php-linter: ## php-cs-fixer
+	$(DOCKER_COMPOSE) exec $(API) vendor/bin/php-cs-fixer check
 .PHONY: php-linter
 
-php-linter-fix: ## php cs fixer fix
-	$(DOCKER_COMPOSE) exec $(PHP) vendor/bin/php-cs-fixer fix
+php-linter-fix: ## php-cs-fixer, en correction
+	$(DOCKER_COMPOSE) exec $(API) vendor/bin/php-cs-fixer fix
 .PHONY: php-linter-fix
 
-admin-linter: ## admin linter
-	$(DOCKER_COMPOSE) exec $(FRONT) yarn lint
-.PHONY: admin-linter
+front-linter: ## eslint sur le front
+	$(DOCKER_COMPOSE) exec $(FRONT) pnpm lint
+.PHONY: front-linter
 
-admin-linter-fix: ## admin linter fix
-	$(DOCKER_COMPOSE) exec $(FRONT) yarn lint:fix
-.PHONY: admin-linter-fix
+front-linter-fix: ## eslint sur le front, en correction
+	$(DOCKER_COMPOSE) exec $(FRONT) pnpm lint:fix
+.PHONY: front-linter-fix
 
 ##
-## CI / CD
+## Intégration continue
 ## -------
 ##
 
-check-php-coverage: ## check php coverage
-	$(DOCKER_COMPOSE) exec $(PHP) /bin/bash -c "export XDEBUG_MODE=coverage && ./vendor/bin/pest --coverage --min=80"
+check-php-coverage: ## vérifier le seuil de couverture PHP
+	$(DOCKER_COMPOSE) exec $(API) /bin/sh -c "export XDEBUG_MODE=coverage && ./vendor/bin/pest --coverage --min=80"
 .PHONY: check-php-coverage
 
-build-php: ## create php package
-	$(DOCKER) rmi $(BUILD_PHP_CONTAINER_NAME) -f
-	$(DOCKER) build backend --target=build_php --tag $(BUILD_PHP_CONTAINER_NAME)
-	$(DOCKER) rm $(BUILD_PHP_CONTAINER_NAME) -f
-	$(DOCKER) run -it --detach --name=$(BUILD_PHP_CONTAINER_NAME) $(BUILD_PHP_CONTAINER_NAME) bash
-	$(DOCKER) exec $(BUILD_PHP_CONTAINER_NAME) tar czf $(BUILD_PHP_PACKAGE_NAME) \
-		bin \
-		config \
-		src \
-		vendor \
-		templates \
-		translations \
-		migrations \
-		composer.json \
-		composer.lock \
-		var/cache/prod \
-		public/index.php \
-		public/bundles
-	mkdir -p build
-	$(DOCKER) cp $(BUILD_PHP_CONTAINER_NAME):/srv/www/$(BUILD_PHP_PACKAGE_NAME) build/$(BUILD_PHP_PACKAGE_NAME)
-	$(DOCKER) rm $(BUILD_PHP_CONTAINER_NAME) -f
-	$(DOCKER) rmi $(BUILD_PHP_CONTAINER_NAME) -f
-.PHONY: build-php
+build-api: ## construire l'image applicative (ENV=staging|production)
+	$(DOCKER) build ./api --target=api-base --tag boilerplate-api:$(or $(ENV),latest)
+.PHONY: build-api
 
-build-admin-staging: ## create admin package for staging
-	$(DOCKER) rmi $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) build admin --target=build_admin_staging --tag $(BUILD_FRONT_CONTAINER_NAME)_dev --no-cache
-	$(DOCKER) rm $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) run -it --detach --name=$(BUILD_FRONT_CONTAINER_NAME)_dev $(BUILD_FRONT_CONTAINER_NAME)_dev sh
-	$(DOCKER) exec $(BUILD_FRONT_CONTAINER_NAME)_dev tar czf $(BUILD_FRONT_PACKAGE_NAME_STAGING) \
-		.output/public
-	mkdir -p build
-	$(DOCKER) cp $(BUILD_FRONT_CONTAINER_NAME)_dev:/usr/src/project/admin/$(BUILD_FRONT_PACKAGE_NAME_STAGING) build/$(BUILD_FRONT_PACKAGE_NAME_STAGING)
-	$(DOCKER) rm $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) rmi $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-.PHONY: build-admin-preprod
-
-build-admin-production: ## create admin package for production
-	$(DOCKER) rmi $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) build admin --target=build_admin_production --tag $(BUILD_FRONT_CONTAINER_NAME)_dev --no-cache
-	$(DOCKER) rm $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) run -it --detach --name=$(BUILD_FRONT_CONTAINER_NAME)_dev $(BUILD_FRONT_CONTAINER_NAME)_dev sh
-	$(DOCKER) exec $(BUILD_FRONT_CONTAINER_NAME)_dev tar czf $(BUILD_FRONT_PACKAGE_NAME_PRODUCTION) \
-		.output/public
-	mkdir -p build
-	$(DOCKER) cp $(BUILD_FRONT_CONTAINER_NAME)_dev:/usr/src/project/admin/$(BUILD_FRONT_PACKAGE_NAME_PRODUCTION) build/$(BUILD_FRONT_PACKAGE_NAME_PRODUCTION)
-	$(DOCKER) rm $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-	$(DOCKER) rmi $(BUILD_FRONT_CONTAINER_NAME)_dev -f
-.PHONY: build-admin-production
+build-front: ## construire le front (ENV=staging|production)
+	$(DOCKER_COMPOSE) run --rm --no-deps $(FRONT) pnpm build
+.PHONY: build-front

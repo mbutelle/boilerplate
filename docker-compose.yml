@@ -9,82 +9,148 @@ services:
             - "--entrypoints.web.address=:80"
             - "--entrypoints.mailhog.address=:8025"
         ports:
-            - "80:80"
-            - "8080:8080"
-            - "3000:3000"
+            # Ports paramétrables : un socle dont les ports sont figés interdit de
+            # faire tourner deux projets qui en sont issus en même temps.
+            - "${HTTP_PORT:-80}:80"
+            - "${TRAEFIK_PORT:-8080}:8080"
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
     api:
-        image: nginx:1.21
-        depends_on:
-            - php
-        volumes:
-            - ./docker/nginx/:/etc/nginx/conf.d/:ro
-            - ./api:/var/www/app
-            - ./var/logs/nginx/:/var/log/nginx
-            - ./var:/var/shared
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.api.rule=Host(`api.boilerplate.localhost`)"
-            - "traefik.http.routers.api.entrypoints=web"
-
-    php:
         build:
             context: ./api
             target: api-base
-        working_dir: /var/www/app
+        # Image nommée : les futurs services qui partagent ce build (worker,
+        # planificateur) la réutilisent, ce qui évite des images divergentes
+        # d'un service à l'autre.
+        image: boilerplate-api
+        # Tourner sous l'utilisateur hôte : les fichiers écrits dans le volume
+        # monté (vendor/, var/log, clés JWT…) lui appartiennent, au lieu d'être
+        # en root et de nécessiter un sudo pour la moindre suppression.
+        user: "${UID:-1000}:${GID:-1000}"
+        # Le binaire frankenphp porte cap_net_bind_service ; la redonner ici la
+        # conserve dans le jeu de capacités une fois qu'on n'est plus root, pour
+        # que Caddy puisse encore écouter sur le port 80 dans le conteneur.
+        cap_add:
+            - NET_BIND_SERVICE
         depends_on:
-            -   mysql
+            database:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
         environment:
-            - PHP_DATE_TIMEZONE=UTC
+            # Runtime FrankenPHP : c'est lui qui garde le noyau Symfony en
+            # mémoire entre les requêtes. Sans cette variable, l'application
+            # tourne en mode classique et le worker ne sert à rien.
+            - APP_RUNTIME=Runtime\FrankenPhpSymfony\Runtime
+            - REDIS_URL=redis://redis:6379
+            # Caddy et Composer écrivent leur état dans des dossiers appartenant
+            # à root dans l'image (/config, /data, /composer). Les rediriger vers
+            # des chemins inscriptibles est ce qui permet de tourner sous un UID
+            # arbitraire ; sans ça le conteneur ne démarre pas.
+            - XDG_CONFIG_HOME=/tmp/caddy-config
+            - XDG_DATA_HOME=/tmp/caddy-data
+            - COMPOSER_HOME=/tmp/composer
         volumes:
             - ./api:/var/www/app/:rw,cached
             - ./var:/var/shared
+        labels:
+            # Noms de routeurs préfixés par le projet : Traefik lit le socket
+            # Docker de la machine entière, donc un routeur générique nommé
+            # « api » entre en collision avec celui d'un autre projet, et
+            # Traefik écarte alors LES DEUX en silence (404 des deux côtés).
+            - "traefik.enable=true"
+            - "traefik.http.routers.boilerplate-api.rule=Host(`api.boilerplate.localhost`)"
+            - "traefik.http.routers.boilerplate-api.entrypoints=web"
+            - "traefik.http.services.boilerplate-api.loadbalancer.server.port=80"
+        healthcheck:
+            test: ["CMD", "curl", "-fsS", "http://localhost/health"]
+            interval: 10s
+            timeout: 5s
+            retries: 10
+            start_period: 90s
+
+    database:
+        image: mysql:8.0
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        environment:
+            MYSQL_DATABASE: boilerplate
+            MYSQL_USER: boilerplate
+            MYSQL_PASSWORD: boilerplate
+            MYSQL_ROOT_PASSWORD: boilerplate
+        volumes:
+            - ./mysql_storage:/var/lib/mysql:rw,delegated
+            - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+        # Aucun port publié : l'api joint la base par son nom de service sur le
+        # réseau compose. Pour brancher un client graphique, ajouter le mapping
+        # dans docker-compose.override.yaml plutôt qu'ici — sinon chaque projet
+        # dérivé du socle se dispute le 3306 de la machine.
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uboilerplate", "-pboilerplate"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+    redis:
+        image: redis:7-alpine
+        healthcheck:
+            test: ["CMD", "redis-cli", "ping"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 
     mailhog:
-        # do not use in production!
+        # ne pas utiliser en production
         image: mailhog/mailhog:latest
         environment:
             - MH_STORAGE=maildir
         volumes:
             - ./docker/mailhog/maildir:/maildir:rw,delegated
-        ports:
-            - "8025:8025"
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.mailhog.rule=Host(`mail.boilerplate.localhost`)"
-            - "traefik.http.routers.mailhog.entrypoints=mailhog"
+            - "traefik.http.routers.boilerplate-mailhog.rule=Host(`mail.boilerplate.localhost`)"
+            - "traefik.http.routers.boilerplate-mailhog.entrypoints=mailhog"
 
-    mysql:
-        image: mariadb:10.4.34
-        command: >-
-            --max_allowed_packet=32505856
-            --sql_mode=""
+    # Installation unique des dépendances du workspace, partagée par tous les
+    # fronts. Un service à part plutôt qu'un `pnpm install` dans chaque conteneur :
+    # sinon plusieurs installations concurrentes écrivent dans le même
+    # node_modules et se marchent dessus.
+    node-install:
+        build:
+            context: ./docker/node
+        image: boilerplate/node-dev
+        user: "${UID:-1000}:${GID:-1000}"
+        working_dir: /usr/src/app
         environment:
-            MARIADB_ROOT_PASSWORD: root
-            MARIADB_DATABASE: boilerplate
-            MARIADB_USER: boilerplate
-            MARIADB_PASSWORD: boilerplate
+            # Sans TTY, pnpm refuse de recréer node_modules et s'arrête sur
+            # ERR_PNPM_ABORTED_REMOVE_MODULES_DIR_NO_TTY. CI=true est la réponse
+            # documentée, et c'est bien le régime d'un service d'installation.
+            - CI=true
         volumes:
-            - ./mysql_storage:/var/lib/mysql:rw,delegated
-        ports:
-            - "3306:3306" # MySQL port
-        cap_add:
-            - SYS_NICE # Eviter "mbind: Operation not permitted" errors
+            - .:/usr/src/app:rw,cached
+        command: pnpm install --frozen-lockfile
+        labels:
+            - "traefik.enable=false"
 
-    client:
-        image: node:24-alpine
+    front:
+        image: boilerplate/node-dev
+        user: "${UID:-1000}:${GID:-1000}"
         depends_on:
-            - api
+            api:
+                condition: service_started
+            node-install:
+                condition: service_completed_successfully
         expose:
-            -   80
+            - 3000
+        working_dir: /usr/src/app/front
+        environment:
+            - API_URL=http://api.boilerplate.localhost
         volumes:
-            - ./front:/usr/src/front:rw,cached
+            - .:/usr/src/app:rw,cached
             - ./var:/var/shared
-        working_dir: /usr/src/front
-        command: /bin/sh -c "yarn install && yarn run dev --host=0.0.0.0 --port=80"
+        command: pnpm dev --host 0.0.0.0 --port 3000
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.client.rule=Host(`client.boilerplate.localhost`)"
-            - "traefik.http.routers.client.entrypoints=web"
+            - "traefik.http.routers.boilerplate-front.rule=Host(`front.boilerplate.localhost`)"
+            - "traefik.http.routers.boilerplate-front.entrypoints=web"
+            - "traefik.http.services.boilerplate-front.loadbalancer.server.port=3000"

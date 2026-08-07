@@ -2,3 +2,11 @@ auth:
     path: /auth
     methods: ['POST']
 
+# Chargeur de routes par attribut. Il manquait au socle : un contrôleur portant
+# #[Route] n'était pas enregistré, sans erreur ni avertissement — la route
+# n'existait simplement pas.
+controllers:
+    resource:
+        path: ../src/Shared/Infrastructure/Symfony/Controller/
+        namespace: App\Shared\Infrastructure\Symfony\Controller
+    type: attribute

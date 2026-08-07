@@ -6,6 +6,14 @@ api_platform:
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
 
+    # Formats déclarés explicitement. multipart doit y figurer pour que
+    # MultipartDecoder et UploadedFileDenormalizer, livrés avec le socle, soient
+    # réellement atteignables : sans cette ligne, un envoi de fichier est rejeté
+    # en 406 avant de les atteindre.
+    formats:
+        jsonld: ['application/ld+json']
+        multipart: ['multipart/form-data']
+
     swagger:
         api_keys:
             JWT:
