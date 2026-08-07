@@ -15,8 +15,10 @@ api_platform:
         paths:
             - '%kernel.project_dir%/src/Security/Entity'
             - '%kernel.project_dir%/src/Security/ApiResource'
-            - '%kernel.project_dir%/src/CoreConfiguration/Entity'
-            - '%kernel.project_dir%/src/CoreConfiguration/Resource'
 
 parameters:
-    domain_resource_mapping:
+    # Associe le FQCN d'un modèle de domaine au FQCN de sa ressource API Platform,
+    # consommé par ApplyCommandProcessor. Vide tant qu'aucune ressource ne passe par
+    # le bus de commande — mais garder une map vide, pas null : ApplyCommandProcessor
+    # attend un array et le container ne compile pas sans ça.
+    domain_resource_mapping: {}

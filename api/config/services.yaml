@@ -1,14 +1,7 @@
-when@dev:
-    parameters:
-        otp_sender: App\Account\Infrastructure\Symfony\Otp\Strategy\EmailOtpNotificationSenderStrategy
-        translator_class: App\Shared\Infrastructure\Symfony\Translator\DummyTranslator
-
 when@prod:
     parameters:
         .container.dumper.inline_factories: true
         debug.container.dump: false
-        otp_sender: App\Account\Infrastructure\Symfony\Otp\Strategy\SmsOtpNotificationSenderStrategy
-        translator_class: App\Shared\Infrastructure\Symfony\Translator\GoogleTranslator
 
 services:
     # default configuration for services in *this* file
@@ -19,9 +12,6 @@ services:
     App\:
         resource: '../src/*'
         exclude: '../src/{Kernel.php}'
-
-    entity_translator:
-        class: '%translator_class%'
 
     Monolog\Processor\MemoryPeakUsageProcessor:
         tags:

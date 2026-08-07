@@ -24,6 +24,8 @@ class PasswordResetRequestEmailSender
         private string $adminUrl,
         #[Autowire('%env(PASSWORD_RESET_URL)%')]
         private string $passwordResetUrl,
+        #[Autowire('%kernel.default_locale%')]
+        private string $defaultLocale,
     ) {
     }
 
@@ -35,7 +37,7 @@ class PasswordResetRequestEmailSender
             $resetUrl = sprintf($this->passwordResetUrl, $user->resetToken);
         }
 
-        $locale = $user->account?->getLocale() ?? 'fr_FR';
+        $locale = $this->defaultLocale;
 
         $email = (new Email())
             ->subject($this->translator->trans('email.password_reset.subject', [], null, $locale))
