@@ -1,0 +1,15 @@
+# Seule docker/fix/Dockerfile se construit depuis la racine : les autres images
+# ont leur propre contexte (./api, ./docker/node).
+.git
+.env
+**/node_modules
+.pnpm-store
+api/vendor
+api/var
+api/.env.local
+mysql_storage
+mailhog_storage
+docker/mysql
+docker/mailhog
+front/.nuxt
+front/.output

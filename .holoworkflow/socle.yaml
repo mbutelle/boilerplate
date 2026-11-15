@@ -11,9 +11,9 @@ stack:
   - "Qualité : Pest 4, PHPStan 2 (niveau 6), php-cs-fixer, Vitest 4, vue-tsc, eslint"
   - "Environnement : Docker Compose et Traefik, piloté par le Makefile"
 commands:
-  start: make start
+  start: make start-wait
   migrate: make migrate
-  qa: make linter phpstan typecheck test
+  qa: make qa
 conventions:
   - "Le back est découpé en contextes sous api/src/<Contexte>/, chacun en Domain, Application et Infrastructure ; le contexte Catalog est la référence à copier."
   - "Toute écriture passe par le bus de commande : une Resource expose, un Payload traduit en commande, ApplyCommandProcessor dispatche ; ajouter l'entrée du modèle dans domain_resource_mapping."

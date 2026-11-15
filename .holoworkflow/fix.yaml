@@ -1,0 +1,63 @@
+# Les corrections qu'Holoworkflow lance après une session d'agent sur un projet
+# issu de ce socle. Lu sur la branche par défaut, jamais sur celle de l'agent :
+# une modification de ce fichier ne prend effet qu'après relecture et fusion.
+version: 1
+
+# Construit depuis la branche par défaut extraite. Les dépendances de l'image
+# vivent sous /workspace, aux chemins listés ci-dessous.
+image:
+  dockerfile: docker/fix/Dockerfile
+
+# Montés en lecture seule par-dessus l'espace de travail de la session.
+dependencies:
+  - api/vendor
+  - node_modules
+  - front/node_modules
+  - packages/api-client/node_modules
+
+# Sans réseau ni secret, dans le seul dossier de la session. Les mêmes outils que
+# `make linter-fix`, appelés directement : le Makefile passe par docker compose.
+steps:
+  - name: php-cs-fixer
+    directory: api
+    command: [vendor/bin/php-cs-fixer, fix]
+  # Le SDK du front est généré depuis l'API (`make sdk`), jamais écrit à la main.
+  # L'export OpenAPI tourne hors ligne : aucune base n'est nécessaire.
+  - name: sdk
+    command: [sh, -c, "php api/bin/console api:openapi:export -o /tmp/openapi.json && cd packages/api-client && OPENAPI_SCHEMA=/tmp/openapi.json node_modules/.bin/orval --config ./orval.config.cjs"]
+  # ESLint lit et écrit front/.nuxt : il est produit ici, depuis la configuration
+  # Nuxt de la branche, dans l'espace de travail (ignoré par git).
+  - name: nuxt-prepare
+    directory: front
+    command: [node_modules/.bin/nuxt, prepare]
+  - name: eslint
+    directory: front
+    command: [node_modules/.bin/eslint, ., --fix]
+
+# Vérifications : après les corrections, elles ne modifient rien. Un échec revient
+# à l'agent avant toute PR. Restent à la CI les tests qui demandent MySQL
+# (tests/Integration) et ceux du front, dont le cache Nuxt doit être inscriptible.
+checks:
+  - name: phpstan
+    directory: api
+    command: [php, -d, memory_limit=-1, vendor/bin/phpstan, analyse, --no-progress]
+  - name: pest
+    directory: api
+    command: [php, -d, memory_limit=512M, vendor/bin/pest, tests/Unit, tests/Architecture]
+  - name: typecheck
+    directory: front
+    command: [node_modules/.bin/nuxt, typecheck]
+  - name: lint
+    directory: front
+    command: [node_modules/.bin/eslint, .]
+
+# Vérification sur la stack complète, quand le poste de l'agent peut la lancer : elle
+# remplace alors les `checks` ci-dessus. Par le Makefile, comme un développeur.
+# Dans l'ordre : la première étape en échec arrête les suivantes.
+verify:
+  - name: start
+    command: [make, start-wait]
+  - name: migrate
+    command: [make, migrate]
+  - name: qa
+    command: [make, qa]
