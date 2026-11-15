@@ -17,6 +17,14 @@ start: env ## démarrer le projet
 	$(DOCKER_COMPOSE) up -d --remove-orphans
 .PHONY: start
 
+# Pour un poste d'agent ou la CI : rend la main quand la stack répond. On n'attend
+# que l'api (healthcheck sur /health) et le front (sans healthcheck, attendu
+# « running ») : le worker et le planificateur désactivent le leur.
+start-wait: env ## démarrer le projet et attendre que l'api et le front soient prêts (poste d'agent, CI)
+	$(DOCKER_COMPOSE) up -d --remove-orphans
+	$(DOCKER_COMPOSE) up -d --wait --wait-timeout 300 $(API) $(FRONT) || { $(DOCKER_COMPOSE) logs --no-log-prefix --tail 40 $(API); exit 1; }
+.PHONY: start-wait
+
 stop: ## arrêter le projet
 	$(DOCKER_COMPOSE) stop
 .PHONY: stop
@@ -128,6 +136,9 @@ typecheck: ## vérifier les types du front
 ## Linters
 ## -------
 ##
+
+qa: linter phpstan typecheck test ## enchaîner linter, phpstan, typecheck et tests (à passer avant toute PR)
+.PHONY: qa
 
 linter: php-linter front-linter ## tous les linters
 .PHONY: linter

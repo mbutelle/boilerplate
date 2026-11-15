@@ -73,6 +73,8 @@ sans quoi le processor lève `No mapping found for …`.
 | Commande            | Effet                                            |
 |---------------------|--------------------------------------------------|
 | `make start` / `stop` / `ps` / `logs` | cycle de vie de la stack      |
+| `make start-wait`   | démarre et attend que l'api et le front répondent |
+| `make qa`           | linter, phpstan, typecheck et tests, avant toute PR |
 | `make test`         | tests back (Pest) et front (Vitest)              |
 | `make phpstan`      | analyse statique, niveau 6, sans baseline        |
 | `make typecheck`    | types du front (vue-tsc)                         |
