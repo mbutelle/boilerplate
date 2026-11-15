@@ -1,0 +1,23 @@
+# Le manifeste de ce socle, pour Holoworkflow : ce qu'il est, en clair, pour qu'un
+# nouveau projet puisse partir de lui. Lu sur la branche par défaut, jamais exécuté.
+version: 1
+name: Socle Symfony + Nuxt
+summary: Une application web avec une API Symfony / API Platform et un front Nuxt en SPA, l'outillage Docker, les tests, l'analyse statique et un SDK généré.
+stack:
+  - "API : Symfony 7.4, API Platform 4.3, PHP 8.3 sous FrankenPHP (worker mode)"
+  - "Données : MySQL 8.0, Redis 7, Doctrine en mapping XML"
+  - "Front : Nuxt 4.5 en SPA, Vue 3.5, PrimeVue 4.5, Tailwind"
+  - "SDK : Orval 8 depuis l'OpenAPI, hooks TanStack Vue Query 5, schémas zod 4"
+  - "Qualité : Pest 4, PHPStan 2 (niveau 6), php-cs-fixer, Vitest 4, vue-tsc, eslint"
+  - "Environnement : Docker Compose et Traefik, piloté par le Makefile"
+commands:
+  start: make start
+  migrate: make migrate
+  qa: make linter phpstan typecheck test
+conventions:
+  - "Le back est découpé en contextes sous api/src/<Contexte>/, chacun en Domain, Application et Infrastructure ; le contexte Catalog est la référence à copier."
+  - "Toute écriture passe par le bus de commande : une Resource expose, un Payload traduit en commande, ApplyCommandProcessor dispatche ; ajouter l'entrée du modèle dans domain_resource_mapping."
+  - "Le mapping Doctrine vit en XML dans api/config/doctrine/mapping/, hors des classes du domaine ; les tests d'architecture verrouillent les frontières."
+  - "Le front n'appelle jamais l'API à la main : packages/api-client est généré par make sdk, et les useCases du front sont de fins adaptateurs sur ses hooks."
+  - "Tests : *.test.ts pour la logique pure, *.nuxt.test.ts pour les composants et composables ; côté back, tests/Unit, tests/Architecture et tests/Integration."
+  - "Toute commande du projet passe par le Makefile."
