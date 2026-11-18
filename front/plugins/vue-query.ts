@@ -30,7 +30,8 @@ export default defineNuxtPlugin((nuxt) => {
 
   if (import.meta.client) {
     nuxt.hooks.hook('app:created', () => {
-      hydrate(queryClient, vueQueryState.value)
+      // Sans état rendu par le serveur (SPA), il n'y a rien à réhydrater.
+      if (vueQueryState.value) hydrate(queryClient, vueQueryState.value)
     })
   }
 })

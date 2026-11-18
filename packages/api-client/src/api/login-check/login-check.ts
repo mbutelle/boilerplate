@@ -59,11 +59,13 @@ export const loginCheckPost = (
 
 
 
-export const getLoginCheckPostMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,{data: BodyType<LoginCheckPostBody>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,{data: BodyType<LoginCheckPostBody>}, TContext> => {
+export const getLoginCheckPostMutationKey = () => ['loginCheckPost'] as const;
 
-const mutationKey = ['loginCheckPost'];
+export const getLoginCheckPostMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,LoginCheckPostMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,LoginCheckPostMutationVariables, TContext> => {
+
+const mutationKey = getLoginCheckPostMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -73,7 +75,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginCheckPost>>, {data: BodyType<LoginCheckPostBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginCheckPost>>, LoginCheckPostMutationVariables> = (props) => {
           const {data} = props ?? {};
 
           return  loginCheckPost(data,requestOptions)
@@ -89,16 +91,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type LoginCheckPostMutationResult = NonNullable<Awaited<ReturnType<typeof loginCheckPost>>>
     export type LoginCheckPostMutationBody = BodyType<LoginCheckPostBody>
     export type LoginCheckPostMutationError = unknown
+    export type LoginCheckPostMutationVariables = {data: BodyType<LoginCheckPostBody>}
 
     /**
+ * Creates a user token.
  * @summary Creates a user token.
  */
 export const useLoginCheckPost = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,{data: BodyType<LoginCheckPostBody>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginCheckPost>>, TError,LoginCheckPostMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof loginCheckPost>>,
         TError,
-        {data: BodyType<LoginCheckPostBody>},
+        LoginCheckPostMutationVariables,
         TContext
       > => {
       return useMutation(getLoginCheckPostMutationOptions(options), queryClient);

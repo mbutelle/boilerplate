@@ -60,8 +60,12 @@ arch('le domaine n\'a pas d\'EntityManager ni de QueryBuilder')
     // Incident constaté ailleurs : la règle « le domaine ne requête pas la base »
     // était connue de tous, et Doctrine\ORM\QueryBuilder est quand même entré
     // dans des contrats de Domain/. Rien ne la testait.
-    ->expect(['Doctrine\ORM\EntityManagerInterface', 'Doctrine\ORM\QueryBuilder'])
-    ->not->toBeUsedIn(['App\Catalog\Domain', 'App\IAM\Domain', 'App\Shared\Domain']);
+    // Une cible par expect(), enchaînées par and() : Pest ne vérifie que la
+    // première d'une liste passée à toBeUsedIn(), et rien du tout d'une liste
+    // passée à expect(). Constaté dans Holoworkflow en posant de vraies violations.
+    ->expect('App\Catalog\Domain')->not->toUse(['Doctrine\ORM\EntityManagerInterface', 'Doctrine\ORM\QueryBuilder'])
+    ->and('App\IAM\Domain')->not->toUse(['Doctrine\ORM\EntityManagerInterface', 'Doctrine\ORM\QueryBuilder'])
+    ->and('App\Shared\Domain')->not->toUse(['Doctrine\ORM\EntityManagerInterface', 'Doctrine\ORM\QueryBuilder']);
 
 arch('les contextes métier restent étanches entre eux')
     // Un contexte qui en importe un autre directement crée un couplage que rien

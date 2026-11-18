@@ -10,34 +10,22 @@ import type { ListProductsSortReference } from './listProductsSortReference';
 import type { ListProductsStatus } from './listProductsStatus';
 
 export type ListProductsParams = {
-/**
- * The collection page number
- */
-page?: number;
-/**
- * The number of items per page
- * @minimum 0
- * @maximum 30
- */
-itemsPerPage?: number;
-/**
- * Product query
- */
-query?: string;
-/**
- * Product status
- */
-status?: ListProductsStatus;
-/**
- * Product sort[name]
- */
-'sort[name]'?: ListProductsSortName;
-/**
- * Product sort[reference]
- */
-'sort[reference]'?: ListProductsSortReference;
-/**
- * Product sort[createdAt]
- */
-'sort[createdAt]'?: ListProductsSortCreatedAt;
+  /** The collection page number */
+  page?: number;
+  /**
+   * The number of items per page
+   * @minimum 0
+   * @maximum 30
+   */
+  itemsPerPage?: number;
+  /** Product query */
+  query?: string;
+  /** Product status */
+  status?: ListProductsStatus;
+  /** Product sort[name] */
+  'sort[name]'?: ListProductsSortName;
+  /** Product sort[reference] */
+  'sort[reference]'?: ListProductsSortReference;
+  /** Product sort[createdAt] */
+  'sort[createdAt]'?: ListProductsSortCreatedAt;
 };

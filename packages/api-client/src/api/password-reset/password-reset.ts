@@ -63,11 +63,13 @@ export const requestPasswordReset = (
 
 
 
-export const getRequestPasswordResetMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,{data: BodyType<PasswordResetRequestPasswordResetPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,{data: BodyType<PasswordResetRequestPasswordResetPayload>}, TContext> => {
+export const getRequestPasswordResetMutationKey = () => ['requestPasswordReset'] as const;
 
-const mutationKey = ['requestPasswordReset'];
+export const getRequestPasswordResetMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,RequestPasswordResetMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,RequestPasswordResetMutationVariables, TContext> => {
+
+const mutationKey = getRequestPasswordResetMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -77,7 +79,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestPasswordReset>>, {data: BodyType<PasswordResetRequestPasswordResetPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof requestPasswordReset>>, RequestPasswordResetMutationVariables> = (props) => {
           const {data} = props ?? {};
 
           return  requestPasswordReset(data,requestOptions)
@@ -93,16 +95,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RequestPasswordResetMutationResult = NonNullable<Awaited<ReturnType<typeof requestPasswordReset>>>
     export type RequestPasswordResetMutationBody = BodyType<PasswordResetRequestPasswordResetPayload>
     export type RequestPasswordResetMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type RequestPasswordResetMutationVariables = {data: BodyType<PasswordResetRequestPasswordResetPayload>}
 
     /**
+ * Creates a PasswordReset resource.
  * @summary Creates a PasswordReset resource.
  */
 export const useRequestPasswordReset = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,{data: BodyType<PasswordResetRequestPasswordResetPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof requestPasswordReset>>, TError,RequestPasswordResetMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof requestPasswordReset>>,
         TError,
-        {data: BodyType<PasswordResetRequestPasswordResetPayload>},
+        RequestPasswordResetMutationVariables,
         TContext
       > => {
       return useMutation(getRequestPasswordResetMutationOptions(options), queryClient);
@@ -130,11 +134,13 @@ passwordResetResetPasswordPayload = toValue(passwordResetResetPasswordPayload);
 
 
 
-export const getResetPasswordMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,{token: string;data: BodyType<PasswordResetResetPasswordPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,{token: string;data: BodyType<PasswordResetResetPasswordPayload>}, TContext> => {
+export const getResetPasswordMutationKey = () => ['resetPassword'] as const;
 
-const mutationKey = ['resetPassword'];
+export const getResetPasswordMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,ResetPasswordMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,ResetPasswordMutationVariables, TContext> => {
+
+const mutationKey = getResetPasswordMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -144,7 +150,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetPassword>>, {token: string;data: BodyType<PasswordResetResetPasswordPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof resetPassword>>, ResetPasswordMutationVariables> = (props) => {
           const {token,data} = props ?? {};
 
           return  resetPassword(token,data,requestOptions)
@@ -160,16 +166,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetPassword>>>
     export type ResetPasswordMutationBody = BodyType<PasswordResetResetPasswordPayload>
     export type ResetPasswordMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type ResetPasswordMutationVariables = {token: string;data: BodyType<PasswordResetResetPasswordPayload>}
 
     /**
+ * Creates a PasswordReset resource.
  * @summary Creates a PasswordReset resource.
  */
 export const useResetPassword = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,{token: string;data: BodyType<PasswordResetResetPasswordPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof resetPassword>>, TError,ResetPasswordMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof resetPassword>>,
         TError,
-        {token: string;data: BodyType<PasswordResetResetPasswordPayload>},
+        ResetPasswordMutationVariables,
         TContext
       > => {
       return useMutation(getResetPasswordMutationOptions(options), queryClient);

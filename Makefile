@@ -47,6 +47,9 @@ help:
 ##
 
 env: ## écrire les UID/GID hôte dans .env pour que les conteneurs tournent sous votre identité
+	@# var/ est monté dans api et front : absent, Docker le crée en root, et
+	@# `make sdk` ne peut plus y écrire l'OpenAPI.
+	@mkdir -p var
 	@grep -q '^UID=' .env 2>/dev/null || echo "UID=$$(id -u)" >> .env
 	@grep -q '^GID=' .env 2>/dev/null || echo "GID=$$(id -g)" >> .env
 	@echo "UID/GID écrits dans .env : $$(id -u):$$(id -g)"
@@ -93,15 +96,20 @@ migrate: ## jouer les migrations
 test: php-test front-test ## lancer tous les tests
 .PHONY: test
 
-php-test: ## lancer les tests Pest
+php-test: php-test-db ## lancer les tests Pest
 	$(DOCKER_COMPOSE) exec $(API) ./vendor/bin/pest
 .PHONY: php-test
 
-php-test-parallel: ## lancer les tests Pest en parallèle
+php-test-db: ## mettre la base de test à jour de ses migrations, pour les tests d'intégration
+	$(DOCKER_COMPOSE) exec $(API) bin/console --env=test doctrine:database:create --if-not-exists --no-interaction
+	$(DOCKER_COMPOSE) exec $(API) bin/console --env=test doctrine:migrations:migrate --no-interaction --allow-no-migration
+.PHONY: php-test-db
+
+php-test-parallel: php-test-db ## lancer les tests Pest en parallèle
 	$(DOCKER_COMPOSE) exec $(API) ./vendor/bin/pest --parallel
 .PHONY: php-test-parallel
 
-php-test-coverage: ## lancer les tests Pest avec couverture
+php-test-coverage: php-test-db ## lancer les tests Pest avec couverture
 	$(DOCKER_COMPOSE) exec $(API) /bin/sh -c "export XDEBUG_MODE=coverage && ./vendor/bin/pest --coverage"
 .PHONY: php-test-coverage
 

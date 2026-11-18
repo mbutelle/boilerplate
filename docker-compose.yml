@@ -7,7 +7,6 @@ services:
             - "--providers.docker=true"
             - "--providers.docker.exposedbydefault=false"
             - "--entrypoints.web.address=:80"
-            - "--entrypoints.mailhog.address=:8025"
         ports:
             # Ports paramétrables : un socle dont les ports sont figés interdit de
             # faire tourner deux projets qui en sont issus en même temps.
@@ -161,17 +160,22 @@ services:
             timeout: 5s
             retries: 5
 
-    mailhog:
-        # ne pas utiliser en production
-        image: mailhog/mailhog:latest
+    mailpit:
+        # ne pas utiliser en production. Mailpit remplace MailHog, qui n'est plus
+        # maintenu : même interface sur 8025, même SMTP sur 1025.
+        image: axllent/mailpit:v1.33.0
         environment:
-            - MH_STORAGE=maildir
+            - MP_DATABASE=/data/mailpit.db
         volumes:
-            - ./docker/mailhog/maildir:/maildir:rw,delegated
+            - ./docker/mailpit:/data:rw,delegated
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.boilerplate-mailhog.rule=Host(`mail.boilerplate.localhost`)"
-            - "traefik.http.routers.boilerplate-mailhog.entrypoints=mailhog"
+            - "traefik.http.routers.boilerplate-mail.rule=Host(`mail.boilerplate.localhost`)"
+            # Entrypoint `web`, comme les autres hôtes : un entrypoint dédié
+            # devrait aussi être publié sur l'hôte. Le port de service est
+            # explicite car Mailpit en expose deux (1025 SMTP, 8025 HTTP).
+            - "traefik.http.routers.boilerplate-mail.entrypoints=web"
+            - "traefik.http.services.boilerplate-mail.loadbalancer.server.port=8025"
 
     # Installation unique des dépendances du workspace, partagée par tous les
     # fronts. Un service à part plutôt qu'un `pnpm install` dans chaque conteneur :

@@ -59,11 +59,13 @@ export const gesdinetJwtRefreshToken = (
 
 
 
-export const getGesdinetJwtRefreshTokenMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,{data: BodyType<GesdinetJwtRefreshTokenBody>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,{data: BodyType<GesdinetJwtRefreshTokenBody>}, TContext> => {
+export const getGesdinetJwtRefreshTokenMutationKey = () => ['gesdinetJwtRefreshToken'] as const;
 
-const mutationKey = ['gesdinetJwtRefreshToken'];
+export const getGesdinetJwtRefreshTokenMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,GesdinetJwtRefreshTokenMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,GesdinetJwtRefreshTokenMutationVariables, TContext> => {
+
+const mutationKey = getGesdinetJwtRefreshTokenMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -73,7 +75,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, {data: BodyType<GesdinetJwtRefreshTokenBody>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, GesdinetJwtRefreshTokenMutationVariables> = (props) => {
           const {data} = props ?? {};
 
           return  gesdinetJwtRefreshToken(data,requestOptions)
@@ -89,16 +91,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type GesdinetJwtRefreshTokenMutationResult = NonNullable<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>>
     export type GesdinetJwtRefreshTokenMutationBody = BodyType<GesdinetJwtRefreshTokenBody>
     export type GesdinetJwtRefreshTokenMutationError = unknown
+    export type GesdinetJwtRefreshTokenMutationVariables = {data: BodyType<GesdinetJwtRefreshTokenBody>}
 
     /**
+ * Refresh token.
  * @summary Refresh token.
  */
 export const useGesdinetJwtRefreshToken = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,{data: BodyType<GesdinetJwtRefreshTokenBody>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>, TError,GesdinetJwtRefreshTokenMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof gesdinetJwtRefreshToken>>,
         TError,
-        {data: BodyType<GesdinetJwtRefreshTokenBody>},
+        GesdinetJwtRefreshTokenMutationVariables,
         TContext
       > => {
       return useMutation(getGesdinetJwtRefreshTokenMutationOptions(options), queryClient);

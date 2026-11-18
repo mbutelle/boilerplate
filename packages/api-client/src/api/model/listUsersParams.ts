@@ -6,8 +6,6 @@
  */
 
 export type ListUsersParams = {
-/**
- * The collection page number
- */
-page?: number;
+  /** The collection page number */
+  page?: number;
 };
