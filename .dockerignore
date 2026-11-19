@@ -8,8 +8,7 @@ api/vendor
 api/var
 api/.env.local
 mysql_storage
-mailhog_storage
 docker/mysql
-docker/mailhog
+docker/mailpit
 front/.nuxt
 front/.output

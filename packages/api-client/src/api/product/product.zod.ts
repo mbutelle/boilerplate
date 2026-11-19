@@ -56,7 +56,7 @@ export const ListProductsResponse = zod.object({
 }).optional()
 })).and(zod.object({
   "member": zod.array(zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -96,7 +96,7 @@ export const CreateProductBody = zod.object({
 })
 
 export const CreateProductResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -122,7 +122,7 @@ export const GetProductParams = zod.object({
 })
 
 export const GetProductResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -172,7 +172,7 @@ export const UpdateProductBody = zod.object({
 })
 
 export const UpdateProductResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -202,7 +202,7 @@ export const PublishProductBody = zod.looseObject({
 })
 
 export const PublishProductResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),

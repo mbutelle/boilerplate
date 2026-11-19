@@ -91,19 +91,25 @@ it('fait implémenter CommandableInterface à tous les payloads', function (): v
 arch('les ressources API Platform vivent en Infrastructure')
     // Poser #[ApiResource] sur un modèle de domaine ramène le framework dans le
     // domaine — c'est exactement la forme dont ce socle a été sorti.
-    ->expect('ApiPlatform\Metadata\ApiResource')
-    ->not->toBeUsedIn(['App\Catalog\Domain', 'App\IAM\Domain', 'App\Shared\Domain']);
+    // Une cible par expect(), enchaînées par and() : Pest ne vérifie que la
+    // première d'une liste passée à toBeUsedIn(), et rien du tout d'une liste
+    // passée à expect(). Constaté dans Holoworkflow en posant de vraies violations.
+    ->expect('App\Catalog\Domain')->not->toUse('ApiPlatform\Metadata\ApiResource')
+    ->and('App\IAM\Domain')->not->toUse('ApiPlatform\Metadata\ApiResource')
+    ->and('App\Shared\Domain')->not->toUse('ApiPlatform\Metadata\ApiResource');
 
 arch('les dépôts concrets restent en Infrastructure')
-    ->expect('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository')
-    ->not->toBeUsedIn(['App\Catalog\Domain', 'App\IAM\Domain', 'App\Catalog\Application', 'App\IAM\Application']);
+    // Une cible par expect(), enchaînées par and() : Pest ne vérifie que la
+    // première d'une liste passée à toBeUsedIn(), et rien du tout d'une liste
+    // passée à expect(). Constaté dans Holoworkflow en posant de vraies violations.
+    ->expect('App\Catalog\Domain')->not->toUse('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository')
+    ->and('App\IAM\Domain')->not->toUse('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository')
+    ->and('App\Catalog\Application')->not->toUse('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository')
+    ->and('App\IAM\Application')->not->toUse('Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository');
 
 arch('RequestStack ne sert pas à lire des paramètres de collection')
     // Les paramètres d'une collection se lisent dans $context['filters'], jamais
     // dans la Request : un paramètre lu ailleurs n'entre pas dans l'OpenAPI,
     // donc pas dans le SDK, et le front demande autre chose que ce qu'on lit.
-    ->expect('Symfony\Component\HttpFoundation\RequestStack')
-    ->not->toBeUsedIn([
-        'App\Catalog\Infrastructure\ApiPlatform\State\Provider',
-        'App\IAM\Infrastructure\ApiPlatform\State\Provider',
-    ]);
+    ->expect('App\Catalog\Infrastructure\ApiPlatform\State\Provider')->not->toUse('Symfony\Component\HttpFoundation\RequestStack')
+    ->and('App\IAM\Infrastructure\ApiPlatform\State\Provider')->not->toUse('Symfony\Component\HttpFoundation\RequestStack');

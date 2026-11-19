@@ -27,7 +27,7 @@ appartiennent.
 |-------------|------------------------------------|
 | Front       | http://front.boilerplate.localhost |
 | API         | http://api.boilerplate.localhost   |
-| MailHog     | http://mail.boilerplate.localhost  |
+| Mailpit     | http://mail.boilerplate.localhost  |
 
 Pour faire tourner plusieurs projets issus de ce socle en même temps, changer les
 ports d'entrée :
@@ -118,7 +118,9 @@ make test
 
 Côté back, trois familles : unitaires (`tests/Unit`, sans base ni conteneur),
 architecture (`tests/Architecture`), intégration (`tests/Integration`, avec le
-noyau).
+noyau et la base `<projet>_test`, que `make php-test` met à jour de ses
+migrations). L'intégration écrit et relit chaque entité mappée : un nom de colonne
+réservé par MySQL, ou un type mal mappé, s'y voit.
 
 Côté front, la convention sépare la logique pure (`*.test.ts`, sans Nuxt) des
 composants et composables (`*.nuxt.test.ts`). Attention au type de mock :

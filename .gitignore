@@ -8,10 +8,9 @@ node_modules/
 .output/
 
 docker/mysql
-docker/mailhog
+docker/mailpit
 
 mysql_storage
-mailhog_storage
 build
 
 var/

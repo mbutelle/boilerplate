@@ -45,7 +45,7 @@ export const ListUsersResponse = zod.object({
 }).optional()
 })).and(zod.object({
   "member": zod.array(zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -68,7 +68,7 @@ export const CreateAdminBody = zod.object({
 })
 
 export const CreateAdminResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -86,7 +86,7 @@ export const CreateAdminResponse = zod.object({
  * @summary Retrieves a User resource.
  */
 export const GetCurrentUserResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),
@@ -128,7 +128,7 @@ export const ChangeUserPasswordBody = zod.object({
 })
 
 export const ChangeUserPasswordResponse = zod.object({
-  "@context": zod.union([zod.string(),zod.object({
+  "@context": zod.union([zod.string(),zod.looseObject({
   "@vocab": zod.string(),
   "hydra": zod.enum(['http://www.w3.org/ns/hydra/core#'])
 })]).optional(),

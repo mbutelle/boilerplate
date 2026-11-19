@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Catalog\Infrastructure\ApiPlatform\Resource;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -52,17 +52,20 @@ use App\Shared\Infrastructure\ApiPlatform\State\Processor\ApplyCommandProcessor;
                 'sort[name]' => new QueryParameter(
                     key: 'sort[name]',
                     schema: ['type' => 'string', 'enum' => ['ASC', 'DESC']],
-                    filter: OrderFilter::class,
+                    filter: new SortFilter(),
+                    property: 'name',
                 ),
                 'sort[reference]' => new QueryParameter(
                     key: 'sort[reference]',
                     schema: ['type' => 'string', 'enum' => ['ASC', 'DESC']],
-                    filter: OrderFilter::class,
+                    filter: new SortFilter(),
+                    property: 'reference',
                 ),
                 'sort[createdAt]' => new QueryParameter(
                     key: 'sort[createdAt]',
                     schema: ['type' => 'string', 'enum' => ['ASC', 'DESC']],
-                    filter: OrderFilter::class,
+                    filter: new SortFilter(),
+                    property: 'createdAt',
                 ),
             ],
         ),

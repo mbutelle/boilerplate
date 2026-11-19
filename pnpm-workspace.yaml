@@ -14,3 +14,6 @@ onlyBuiltDependencies:
   - rolldown
   - unrs-resolver
   - vue-demi
+# Une version publiée il y a moins de 7 jours n'est pas installée : un paquet
+# compromis est en général retiré dans ce délai (pnpm 10.16+). Le temps est en minutes.
+minimumReleaseAge: 10080

@@ -34,7 +34,7 @@ import type {
   ConstraintViolationJsonld,
   Error,
   ErrorJsonld,
-  ListProducts200,
+  ListProducts200One,
   ListProductsParams,
   ProductCreateProductPayload,
   ProductJsonld,
@@ -64,7 +64,7 @@ export const listProducts = (
 ) => {
       params = toValue(params);
 
-      return CustomHttpClient<ListProducts200>(
+      return CustomHttpClient<ListProducts200One | Blob>(
       {url: `/products`, method: 'GET',
         params, signal
     },
@@ -96,7 +96,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type ListProductsQueryResult = NonNullable<Awaited<ReturnType<typeof listProducts>>>
@@ -104,9 +104,9 @@ export type ListProductsQueryError = unknown
 
 
 /**
+ * Retrieves the collection of Product resources.
  * @summary Retrieves the collection of Product resources.
  */
-
 export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>, TError = unknown>(
  params?: MaybeRefOrGetter<ListProductsParams>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
@@ -114,7 +114,7 @@ export function useListProducts<TData = Awaited<ReturnType<typeof listProducts>>
 
   const queryOptions = getListProductsQueryOptions(params,options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions as UseQueryOptions<Awaited<ReturnType<typeof listProducts>>, TError, TData>, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
 
@@ -136,7 +136,7 @@ export const createProduct = (
 ) => {
       productCreateProductPayload = toValue(productCreateProductPayload);
 
-      return CustomHttpClient<ProductJsonld>(
+      return CustomHttpClient<ProductJsonld | Blob>(
       {url: `/products`, method: 'POST',
       headers: {'Content-Type': 'application/ld+json', },
       data: productCreateProductPayload, signal
@@ -147,11 +147,13 @@ export const createProduct = (
 
 
 
-export const getCreateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext> => {
+export const getCreateProductMutationKey = () => ['createProduct'] as const;
 
-const mutationKey = ['createProduct'];
+export const getCreateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,CreateProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,CreateProductMutationVariables, TContext> => {
+
+const mutationKey = getCreateProductMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -161,7 +163,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProduct>>, {data: BodyType<ProductCreateProductPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createProduct>>, CreateProductMutationVariables> = (props) => {
           const {data} = props ?? {};
 
           return  createProduct(data,requestOptions)
@@ -177,16 +179,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateProductMutationResult = NonNullable<Awaited<ReturnType<typeof createProduct>>>
     export type CreateProductMutationBody = BodyType<ProductCreateProductPayload>
     export type CreateProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type CreateProductMutationVariables = {data: BodyType<ProductCreateProductPayload>}
 
     /**
+ * Creates a Product resource.
  * @summary Creates a Product resource.
  */
 export const useCreateProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,{data: BodyType<ProductCreateProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createProduct>>, TError,CreateProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof createProduct>>,
         TError,
-        {data: BodyType<ProductCreateProductPayload>},
+        CreateProductMutationVariables,
         TContext
       > => {
       return useMutation(getCreateProductMutationOptions(options), queryClient);
@@ -201,7 +205,7 @@ export const getProduct = (
 ) => {
       id = toValue(id);
 
-      return CustomHttpClient<ProductJsonld>(
+      return CustomHttpClient<ProductJsonld | Blob>(
       {url: `/products/${id}`, method: 'GET', signal
     },
       options);
@@ -232,7 +236,7 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 
 
 
-   return  { queryKey, queryFn, enabled: computed(() => toValue(id) !== null && toValue(id) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>
+   return  { queryKey, queryFn, enabled: computed(() => toValue(id) !== null && toValue(id) !== undefined), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
 export type GetProductQueryResult = NonNullable<Awaited<ReturnType<typeof getProduct>>>
@@ -240,9 +244,9 @@ export type GetProductQueryError = ErrorJsonld | Error
 
 
 /**
+ * Retrieves a Product resource.
  * @summary Retrieves a Product resource.
  */
-
 export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TError = ErrorJsonld | Error>(
  id: MaybeRefOrGetter<string>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient
@@ -250,7 +254,7 @@ export function useGetProduct<TData = Awaited<ReturnType<typeof getProduct>>, TE
 
   const queryOptions = getGetProductQueryOptions(id,options)
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions as UseQueryOptions<Awaited<ReturnType<typeof getProduct>>, TError, TData>, queryClient) as UseQueryReturnType<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   query.queryKey = unref(queryOptions).queryKey as DataTag<QueryKey, TData, TError>;
 
@@ -281,11 +285,13 @@ export const deleteProduct = (
 
 
 
-export const getDeleteProductMutationOptions = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext> => {
+export const getDeleteProductMutationKey = () => ['deleteProduct'] as const;
 
-const mutationKey = ['deleteProduct'];
+export const getDeleteProductMutationOptions = <TError = ErrorJsonld | Error,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,DeleteProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,DeleteProductMutationVariables, TContext> => {
+
+const mutationKey = getDeleteProductMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -295,7 +301,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProduct>>, {id: string}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteProduct>>, DeleteProductMutationVariables> = (props) => {
           const {id} = props ?? {};
 
           return  deleteProduct(id,requestOptions)
@@ -311,16 +317,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteProductMutationResult = NonNullable<Awaited<ReturnType<typeof deleteProduct>>>
 
     export type DeleteProductMutationError = ErrorJsonld | Error
+    export type DeleteProductMutationVariables = {id: string}
 
     /**
+ * Removes the Product resource.
  * @summary Removes the Product resource.
  */
 export const useDeleteProduct = <TError = ErrorJsonld | Error,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,{id: string}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteProduct>>, TError,DeleteProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof deleteProduct>>,
         TError,
-        {id: string},
+        DeleteProductMutationVariables,
         TContext
       > => {
       return useMutation(getDeleteProductMutationOptions(options), queryClient);
@@ -337,7 +345,7 @@ export const updateProduct = (
       id = toValue(id);
 productUpdateProductPayloadJsonMergePatch = toValue(productUpdateProductPayloadJsonMergePatch);
 
-      return CustomHttpClient<ProductJsonld>(
+      return CustomHttpClient<ProductJsonld | Blob>(
       {url: `/products/${id}`, method: 'PATCH',
       headers: {'Content-Type': 'application/merge-patch+json', },
       data: productUpdateProductPayloadJsonMergePatch, signal
@@ -348,11 +356,13 @@ productUpdateProductPayloadJsonMergePatch = toValue(productUpdateProductPayloadJ
 
 
 
-export const getUpdateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext> => {
+export const getUpdateProductMutationKey = () => ['updateProduct'] as const;
 
-const mutationKey = ['updateProduct'];
+export const getUpdateProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,UpdateProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,UpdateProductMutationVariables, TContext> => {
+
+const mutationKey = getUpdateProductMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -362,7 +372,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProduct>>, {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateProduct>>, UpdateProductMutationVariables> = (props) => {
           const {id,data} = props ?? {};
 
           return  updateProduct(id,data,requestOptions)
@@ -378,16 +388,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateProductMutationResult = NonNullable<Awaited<ReturnType<typeof updateProduct>>>
     export type UpdateProductMutationBody = BodyType<ProductUpdateProductPayloadJsonMergePatch>
     export type UpdateProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type UpdateProductMutationVariables = {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}
 
     /**
+ * Updates the Product resource.
  * @summary Updates the Product resource.
  */
 export const useUpdateProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,{id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateProduct>>, TError,UpdateProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof updateProduct>>,
         TError,
-        {id: string;data: BodyType<ProductUpdateProductPayloadJsonMergePatch>},
+        UpdateProductMutationVariables,
         TContext
       > => {
       return useMutation(getUpdateProductMutationOptions(options), queryClient);
@@ -404,7 +416,7 @@ export const publishProduct = (
       id = toValue(id);
 productPublishProductPayload = toValue(productPublishProductPayload);
 
-      return CustomHttpClient<ProductJsonld>(
+      return CustomHttpClient<ProductJsonld | Blob>(
       {url: `/products/${id}/publish`, method: 'POST',
       headers: {'Content-Type': 'application/ld+json', },
       data: productPublishProductPayload, signal
@@ -415,11 +427,13 @@ productPublishProductPayload = toValue(productPublishProductPayload);
 
 
 
-export const getPublishProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
-): UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext> => {
+export const getPublishProductMutationKey = () => ['publishProduct'] as const;
 
-const mutationKey = ['publishProduct'];
+export const getPublishProductMutationOptions = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,PublishProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+): UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,PublishProductMutationVariables, TContext> => {
+
+const mutationKey = getPublishProductMutationKey();
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -429,7 +443,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishProduct>>, {id: string;data: BodyType<ProductPublishProductPayload>}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof publishProduct>>, PublishProductMutationVariables> = (props) => {
           const {id,data} = props ?? {};
 
           return  publishProduct(id,data,requestOptions)
@@ -445,16 +459,18 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PublishProductMutationResult = NonNullable<Awaited<ReturnType<typeof publishProduct>>>
     export type PublishProductMutationBody = BodyType<ProductPublishProductPayload>
     export type PublishProductMutationError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation
+    export type PublishProductMutationVariables = {id: string;data: BodyType<ProductPublishProductPayload>}
 
     /**
+ * Creates a Product resource.
  * @summary Creates a Product resource.
  */
 export const usePublishProduct = <TError = ErrorJsonld | Error | ConstraintViolationJsonld | ConstraintViolation,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,{id: string;data: BodyType<ProductPublishProductPayload>}, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof publishProduct>>, TError,PublishProductMutationVariables, TContext>, request?: SecondParameter<typeof CustomHttpClient>}
  , queryClient?: QueryClient): UseMutationReturnType<
         Awaited<ReturnType<typeof publishProduct>>,
         TError,
-        {id: string;data: BodyType<ProductPublishProductPayload>},
+        PublishProductMutationVariables,
         TContext
       > => {
       return useMutation(getPublishProductMutationOptions(options), queryClient);

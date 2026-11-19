@@ -5,11 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { HydraCollectionBaseSchema } from './hydraCollectionBaseSchema';
-import type { UserJsonld } from './userJsonld';
+import type { ProductJsonld } from './productJsonld';
 
 /**
- * User.jsonld collection.
+ * Product.jsonld collection.
  */
-export type ListUsers200 = HydraCollectionBaseSchema & {
-  member: UserJsonld[];
+export type ListProducts200One = HydraCollectionBaseSchema & {
+  member: ProductJsonld[];
 };
